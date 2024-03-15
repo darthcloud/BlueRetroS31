@@ -9,7 +9,6 @@
 #include <freertos/task.h>
 #include <freertos/ringbuf.h>
 #include <esp_system.h>
-#include <esp_bt.h>
 #include <esp_mac.h>
 #include <esp_timer.h>
 #include <driver/gpio.h>
@@ -33,9 +32,17 @@
 #include "adapter/hid_parser.h"
 #include "bluetooth/hidp/ps.h"
 
+#ifdef CONFIG_BLUERETRO_BT_EXTERNAL_H4
+#include "hci_uart.h"
+#else
+#include <esp_bt.h>
+#endif
+
 #define BT_TX 0
 #define BT_RX 1
 #define BT_FB_TASK_DELAY_CNT 30
+
+#define PICO_EN_PIN 7
 
 enum {
     /* BT CTRL flags */
@@ -79,11 +86,14 @@ static void bt_host_tx_pkt_ready(void);
 static int bt_host_rx_pkt(uint8_t *data, uint16_t len);
 static void bt_host_task(void *param);
 
+#ifndef CONFIG_BLUERETRO_BT_EXTERNAL_H4
 static esp_vhci_host_callback_t vhci_host_cb = {
     bt_host_tx_pkt_ready,
     bt_host_rx_pkt
 };
+#endif
 
+#ifndef CONFIG_BLUERETRO_BT_EXTERNAL_H4
 static int32_t bt_host_load_bdaddr_from_nvs(void) {
     int32_t ret = -1;
 
@@ -94,6 +104,7 @@ static int32_t bt_host_load_bdaddr_from_nvs(void) {
     // ret = 0;
     return ret;
 }
+#endif
 
 static int32_t bt_host_load_keys_from_file(struct bt_host_link_keys *data) {
     struct stat st;
@@ -189,8 +200,12 @@ static void bt_tx_task(void *param) {
                 else {
                     bt_mon_tx((packet[0] == BT_HCI_H4_TYPE_CMD) ? BT_MON_CMD : BT_MON_ACL_TX,
                         packet + 1, packet_len - 1);
+#ifdef CONFIG_BLUERETRO_BT_EXTERNAL_H4
+                    hci_uart_tx(packet, packet_len);
+#else
                     atomic_clear_bit(&bt_flags, BT_CTRL_READY);
                     esp_vhci_host_send_packet(packet, packet_len);
+#endif
                 }
                 vRingbufferReturnItem(txq_hdl, (void *)packet);
             }
@@ -540,7 +555,7 @@ void bt_host_q_wait_pkt(uint32_t ms) {
 }
 
 int32_t bt_host_init(void) {
-    int32_t ret;
+    int32_t ret = 0;
 
 #ifdef CONFIG_BLUERETRO_BT_TIMING_TESTS
     gpio_config_t io_conf = {0};
@@ -553,6 +568,22 @@ int32_t bt_host_init(void) {
     gpio_set_level(26, 1);
 #endif
 
+#ifdef CONFIG_BLUERETRO_BT_EXTERNAL_H4
+    /* Start ESP32-PICO BT radio */
+    gpio_config_t io_conf = {0};
+    gpio_set_level(PICO_EN_PIN, 1);
+    io_conf.intr_type = GPIO_INTR_DISABLE;
+    io_conf.mode = GPIO_MODE_OUTPUT;
+    io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
+    io_conf.pull_up_en = GPIO_PULLUP_DISABLE;
+    io_conf.pin_bit_mask = 1ULL << PICO_EN_PIN;
+    gpio_config(&io_conf);
+
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+
+    hci_uart_init(UART_NUM_1, 921600, UART_DATA_8_BITS, UART_STOP_BITS_1,
+        UART_PARITY_DISABLE, UART_HW_FLOWCTRL_CTS_RTS, bt_host_rx_pkt);
+#else
     bt_host_load_bdaddr_from_nvs();
 
     bt_mon_init();
@@ -570,6 +601,7 @@ int32_t bt_host_init(void) {
     }
 
     esp_vhci_host_register_callback(&vhci_host_cb);
+#endif
 
     bt_host_tx_pkt_ready();
 
@@ -582,9 +614,9 @@ int32_t bt_host_init(void) {
     bt_host_load_keys_from_file(&bt_host_link_keys);
     bt_host_load_le_keys_from_file(&bt_host_le_link_keys);
 
-    xTaskCreatePinnedToCore(&bt_host_task, "bt_host_task", 3072, NULL, 5, NULL, 0);
-    xTaskCreatePinnedToCore(&bt_fb_task, "bt_fb_task", 3072, NULL, 10, NULL, 0);
-    xTaskCreatePinnedToCore(&bt_tx_task, "bt_tx_task", 2048, NULL, 11, NULL, 0);
+    xTaskCreatePinnedToCore(bt_host_task, "bt_host_task", 3072, NULL, 5, NULL, 0);
+    xTaskCreatePinnedToCore(bt_fb_task, "bt_fb_task", 3072, NULL, 10, NULL, 0);
+    xTaskCreatePinnedToCore(bt_tx_task, "bt_tx_task", 2048, NULL, 11, NULL, 0);
 
     if (bt_hci_init()) {
         printf("# HCI init fail.\n");
