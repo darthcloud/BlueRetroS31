@@ -16,20 +16,16 @@
 
 #define GP01_AXES_MAX 2
 enum {
-    GP01_LD_RIGHT,
-    GP01_LD_LEFT,
-    GP01_LD_DOWN,
-    GP01_LD_UP,
+    GP01_KP1,
+    GP01_KP2,
+    GP01_KP3,
     GP01_START,
-    GP01_Z,
-    GP01_B,
-    GP01_A,
-    GP01_C_RIGHT,
-    GP01_C_LEFT,
-    GP01_C_DOWN,
-    GP01_C_UP,
-    GP01_R,
-    GP01_L,
+    GP01_KP4,
+    GP01_KP5,
+    GP01_KP6,
+    GP01_PAUSE,
+    GP01_T_TRIG,
+    GP01_B_TRIG,
 };
 
 static DRAM_ATTR const uint8_t gp01_axes_idx[ADAPTER_MAX_AXES] =
@@ -55,17 +51,17 @@ struct gp01_map {
     uint16_t axes[2];
 } __packed;
 
-static const uint32_t gp01_mask[4] = {0x77DF0FFF, 0x00000000, 0x00000000, BR_COMBO_MASK};
+static const uint32_t gp01_mask[4] = {0xBBFF0F0F, 0x00000000, 0x00000000, BR_COMBO_MASK};
 static const uint32_t gp01_desc[4] = {0x0000000F, 0x00000000, 0x00000000, 0x00000000};
 static DRAM_ATTR const uint32_t gp01_btns_mask[32] = {
     0, 0, 0, 0,
-    BIT(GP01_C_LEFT), BIT(GP01_C_RIGHT), BIT(GP01_C_DOWN), BIT(GP01_C_UP),
-    BIT(GP01_LD_LEFT), BIT(GP01_LD_RIGHT), BIT(GP01_LD_DOWN), BIT(GP01_LD_UP),
     0, 0, 0, 0,
-    BIT(GP01_B), BIT(GP01_C_DOWN), BIT(GP01_A), BIT(GP01_C_LEFT),
-    BIT(GP01_START), 0, 0, 0,
-    BIT(GP01_Z), BIT(GP01_L), BIT(GP01_C_UP), 0,
-    BIT(GP01_Z), BIT(GP01_R), BIT(GP01_C_RIGHT), 0,
+    BIT(GP01_KP4), BIT(GP01_KP6), 0, BIT(GP01_KP2),
+    0, 0, 0, 0,
+    BIT(GP01_T_TRIG), BIT(GP01_KP3), BIT(GP01_B_TRIG), BIT(GP01_KP1),
+    BIT(GP01_START), BIT(GP01_PAUSE), 0, BIT(GP01_KP5),
+    0, 0, 0, 0,
+    0, 0, 0, 0,
 };
 
 static const uint32_t gp01_mouse_mask[4] = {0x110000F0, 0x00000000, 0x00000000, BR_COMBO_MASK};
@@ -77,8 +73,8 @@ static const uint32_t gp01_mouse_btns_mask[32] = {
     0, 0, 0, 0,
     0, 0, 0, 0,
     0, 0, 0, 0,
-    BIT(GP01_B), 0, 0, 0,
-    BIT(GP01_A), 0, 0, 0,
+    BIT(GP01_T_TRIG), 0, 0, 0,
+    BIT(GP01_B_TRIG), 0, 0, 0,
 };
 
 void IRAM_ATTR gp01_init_buffer(int32_t dev_mode, struct wired_data *wired_data) {
