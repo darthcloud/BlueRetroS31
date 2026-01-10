@@ -70,3 +70,4 @@ trace/
 managed_components/
 dependencies.lock
 keys/
+.cache/
