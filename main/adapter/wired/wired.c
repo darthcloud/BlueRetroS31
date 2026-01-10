@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024, Jacques Gagnon
+ * Copyright (c) 2021-2026, Jacques Gagnon
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -25,6 +25,7 @@
 #include "sea.h"
 #include "wii.h"
 #include "xbox.h"
+#include "gp01.h"
 #include "wired.h"
 
 static from_generic_t from_generic_func[WIRED_MAX] = {
@@ -54,6 +55,7 @@ static from_generic_t from_generic_func[WIRED_MAX] = {
     sea_from_generic, /* SEA_BOARD */
     NULL, /* SPI */
     xbox_from_generic, /* XBOX */
+    gp01_from_generic, /* GP01 */
 };
 
 static fb_to_generic_t fb_to_generic_func[WIRED_MAX] = {
@@ -83,6 +85,7 @@ static fb_to_generic_t fb_to_generic_func[WIRED_MAX] = {
     NULL, /* SEA_BOARD */
     NULL, /* SPI */
     xbox_fb_to_generic, /* XBOX */
+    gp01_fb_to_generic, /* GP01 */
 };
 
 static meta_init_t meta_init_func[WIRED_MAX] = {
@@ -112,6 +115,7 @@ static meta_init_t meta_init_func[WIRED_MAX] = {
     sea_meta_init, /* SEA_BOARD */
     NULL, /* SPI */
     xbox_meta_init, /* XBOX */
+    gp01_meta_init, /* GP01 */
 };
 
 static DRAM_ATTR buffer_init_t buffer_init_func[WIRED_MAX] = {
@@ -141,6 +145,7 @@ static DRAM_ATTR buffer_init_t buffer_init_func[WIRED_MAX] = {
     sea_init_buffer, /* SEA_BOARD */
     NULL, /* SPI */
     xbox_init_buffer, /* XBOX */
+    gp01_init_buffer, /* GP01 */
 };
 
 static const uint32_t menu_desc[4] = {0x00000000, 0x00000000, 0x00000000, 0x00000000};

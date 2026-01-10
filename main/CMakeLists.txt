@@ -26,6 +26,7 @@ set(cov_srcs
     "adapter/wired/sea.c"
     "adapter/wired/wii.c"
     "adapter/wired/xbox.c"
+    "adapter/wired/gp01.c"
     "adapter/wired/parallel_1p.c"
     "adapter/wired/parallel_2p.c"
     "adapter/wired/wired.c"
