@@ -7,6 +7,7 @@
 #include "parallel.h"
 #include "sea_io.h"
 #include "xbox_usb.h"
+#include "adapter/wired/gp01.h"
 #include "adapter/adapter.h"
 #include "wired_rtos.h"
 
@@ -43,6 +44,7 @@ static const wired_init_t wired_init[WIRED_MAX] = {
 #else
     NULL, /* XBOX */
 #endif
+    gp01_init, /* GP01 */
 };
 
 void wired_rtos_init(void) {

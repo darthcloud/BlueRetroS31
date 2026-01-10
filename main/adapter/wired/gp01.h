@@ -7,6 +7,7 @@
 #define _GP01_H_
 #include "adapter/adapter.h"
 
+void gp01_init(void);
 void gp01_meta_init(struct wired_ctrl *ctrl_data);
 void gp01_init_buffer(int32_t dev_mode, struct wired_data *wired_data);
 void gp01_from_generic(int32_t dev_mode, struct wired_ctrl *ctrl_data, struct wired_data *wired_data);
