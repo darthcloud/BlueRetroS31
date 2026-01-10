@@ -172,6 +172,7 @@ static void gp01_ctrl_from_generic(struct wired_ctrl *ctrl_data, struct wired_da
             else {
                 map_tmp.axes.axes[gp01_axes_idx[i]] = (uint8_t)(ctrl_data->axes[i].value + ctrl_data->axes[i].meta->neutral);
             }
+            map_tmp.axes.axes[gp01_axes_idx[i]] <<= 6;
         }
         wired_data->cnt_mask[axis_to_btn_id(i)] = ctrl_data->axes[i].cnt_mask;
     }
