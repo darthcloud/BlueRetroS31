@@ -132,10 +132,29 @@ set(embed
     ${project_dir}/keys/xbox.pem
 )
 
+set(components
+    "app_update"
+    "bt"
+    "driver"
+    "efuse"
+    "esp_driver_gpio"
+    "esp_driver_ledc"
+    "esp_driver_rmt"
+    "esp_driver_spi"
+    "esp_driver_uart"
+    "esp_ringbuf"
+    "esp_timer"
+    "nvs_flash"
+    "spiffs"
+
+    "queue_bss"
+)
+
 idf_component_register(
     SRCS "${srcs}" "${cov_srcs}"
     PRIV_INCLUDE_DIRS "."
     LDFRAGMENTS linker.lf
+    PRIV_REQUIRES "${components}"
 )
 
 target_compile_options(${COMPONENT_LIB} PRIVATE -Wno-address-of-packed-member)
@@ -163,7 +182,8 @@ endif()
 
 if(CONFIG_IDF_TARGET_ESP32S2)
     idf_build_set_property(COMPILE_DEFINITIONS "-DCONFIG_ATOMIC_OPERATIONS_BUILTIN" APPEND)
+
+    create_esp_enc_img(${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}.bin
+        ${embed} ${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}_secure.bin app)
 endif()
 
-create_esp_enc_img(${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}.bin
-    ${embed} ${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}_secure.bin app)

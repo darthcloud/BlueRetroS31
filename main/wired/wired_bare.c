@@ -5,6 +5,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include "adapter/adapter.h"
 #include "npiso_io.h"
 #include "cdi_uart.h"
 #include "sega_io.h"

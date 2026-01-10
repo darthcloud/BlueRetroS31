@@ -21,7 +21,17 @@
 #define GREEN "\033[1;32m"
 
 #define BT_MAX_DEV 7 /* BT limitation */
+
+#ifdef CONFIG_BLUERETRO_SYSTEM_XBOX
 #define WIRED_MAX_DEV 5
+#else
+#ifdef CONFIG_BLUERETRO_QEMU
+#define WIRED_MAX_DEV 8
+#else
+#define WIRED_MAX_DEV 12
+#endif
+#endif
+
 #define ADAPTER_MAX_AXES 6
 #define ADAPTER_PS2_MAX_AXES 16
 #define REPORT_MAX_USAGE 24

@@ -38,7 +38,11 @@ static const wired_init_t wired_init[WIRED_MAX] = {
     parallel_io_init, /* PARALLEL_2P_OD */
     sea_init, /* SEA_BOARD */
     NULL, /* SPI */
+#ifdef CONFIG_BLUERETRO_SYSTEM_XBOX
     xbox_init, /* XBOX */
+#else
+    NULL, /* XBOX */
+#endif
 };
 
 void wired_rtos_init(void) {

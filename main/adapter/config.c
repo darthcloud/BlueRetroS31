@@ -515,14 +515,14 @@ void config_init_mapping_bank(struct config *data, uint32_t index) {
 #ifdef CONFIG_BLUERETRO_SYSTEM_XBOX
     for (uint32_t j = 0; j < PAD_MAX; j++) {
 #else
-    for (; j < KBM_MAX; j++) {
+    for (uint32_t j = 0; j < KBM_MAX; j++) {
 #endif
         data->in_cfg[index].map_cfg[idx].src_btn = j;
         data->in_cfg[index].map_cfg[idx].dst_btn = j;
 #ifdef CONFIG_BLUERETRO_SYSTEM_XBOX
         data->in_cfg[index].map_cfg[idx].dst_id = 0;
 #else
-        data->in_cfg[index].map_cfg[idx].dst_id = i;
+        data->in_cfg[index].map_cfg[idx].dst_id = index;
 #endif
         data->in_cfg[index].map_cfg[idx].perc_max = 100;
         data->in_cfg[index].map_cfg[idx].perc_threshold = 50;
@@ -537,7 +537,7 @@ void config_init_mapping_bank(struct config *data, uint32_t index) {
 #ifdef CONFIG_BLUERETRO_SYSTEM_XBOX
         data->in_cfg[index].map_cfg[idx].dst_id = 0;
 #else
-        data->in_cfg[index].map_cfg[idx].dst_id = i;
+        data->in_cfg[index].map_cfg[idx].dst_id = index;
 #endif
         data->in_cfg[index].map_cfg[idx].perc_max = 100;
         data->in_cfg[index].map_cfg[idx].perc_threshold = 50;

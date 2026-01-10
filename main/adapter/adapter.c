@@ -432,7 +432,9 @@ void adapter_bridge(struct bt_data *bt_data) {
                 return;
             }
 
+#ifdef CONFIG_BLUERETRO_SYSTEM_XBOX
             uint32_t cfg_idx = (in_menu) ? 4 : bt_data->base.pids->out_idx + config.global_cfg.banksel;
+#endif
 
             adapter_out_mask[bt_data->base.pids->out_idx] =
 #ifdef CONFIG_BLUERETRO_SYSTEM_XBOX
