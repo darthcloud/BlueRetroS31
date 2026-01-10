@@ -138,6 +138,11 @@ menu "BlueRetro"
             help
                 Select this to support only XBOX.
 
+        config BLUERETRO_SYSTEM_GP01
+            bool "GP01"
+            help
+                Select this to support only GP01.
+
     endchoice
 
     menu "Debug"

@@ -98,6 +98,7 @@ enum {
     SEA_BOARD,
     SPI,
     XBOX,
+    GP01,
     WIRED_MAX,
 };
 

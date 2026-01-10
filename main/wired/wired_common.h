@@ -54,6 +54,8 @@
 #define HARDCODED_SYS SPI
 #elif defined(CONFIG_BLUERETRO_SYSTEM_XBOX)
 #define HARDCODED_SYS XBOX
+#elif defined(CONFIG_BLUERETRO_SYSTEM_GP01)
+#define HARDCODED_SYS GP01
 #endif
 
 const char *wired_get_sys_name(void);
