@@ -17,6 +17,8 @@
 
 #define GP01_AXES_MAX 2
 enum {
+    GP01_T_TRIG = 6,
+    GP01_B_TRIG,
     GP01_KP1,
     GP01_KP2,
     GP01_KP3,
@@ -25,8 +27,6 @@ enum {
     GP01_KP5,
     GP01_KP6,
     GP01_PAUSE,
-    GP01_T_TRIG,
-    GP01_B_TRIG,
 };
 
 static i2c_master_bus_config_t i2c_mst_config = {
@@ -182,6 +182,7 @@ static void gp01_ctrl_from_generic(struct wired_ctrl *ctrl_data, struct wired_da
     memcpy(wired_data->output, (void *)&map_tmp, sizeof(map_tmp));
 
     i2c_master_transmit(dev_handle, (uint8_t *)&map_tmp.axes, sizeof(map_tmp.axes), -1);
+    i2c_master_transmit(dev_handle, (uint8_t *)&map_tmp.btn, sizeof(map_tmp.btn), -1);
 
     TESTS_CMDS_LOG("\"wired_output\": {\"axes\": [%d, %d], \"btns\": %d},\n",
         map_tmp.axes[gp01_axes_idx[0]], map_tmp.axes[gp01_axes_idx[1]], map_tmp.buttons);
