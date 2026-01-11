@@ -35,6 +35,7 @@ static const char *sys_name[WIRED_MAX] = {
     "SEA Board",
     "SPI",
     "XBOX",
+    "GP01",
 };
 
 const char *wired_get_sys_name(void) {

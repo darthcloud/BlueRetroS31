@@ -53,24 +53,24 @@ static DRAM_ATTR const uint8_t gp01_axes_idx[ADAPTER_MAX_AXES] =
 static DRAM_ATTR const struct ctrl_meta gp01_axes_meta[GP01_AXES_MAX] =
 {
     {.size_min = -512, .size_max = 511, .neutral = 0x200, .abs_max = 0x1FF, .abs_min = 0x200},
-    {.size_min = -512, .size_max = 511, .neutral = 0x200, .abs_max = 0x1FF, .abs_min = 0x200},
+    {.size_min = -512, .size_max = 511, .neutral = 0x200, .abs_max = 0x1FF, .abs_min = 0x200, .polarity = 1},
 };
 
 static DRAM_ATTR const struct ctrl_meta gp01_mouse_axes_meta[GP01_AXES_MAX] =
 {
     {.size_min = -512, .size_max = 511, .neutral = 0x200, .abs_max = 0x1FF, .abs_min = 0x200},
-    {.size_min = -512, .size_max = 511, .neutral = 0x200, .abs_max = 0x1FF, .abs_min = 0x200},
+    {.size_min = -512, .size_max = 511, .neutral = 0x200, .abs_max = 0x1FF, .abs_min = 0x200, .polarity = 1},
 };
 
 struct gp01_map {
     struct {
         uint8_t btn_addr;
         uint16_t buttons;
-    } btn;
+    } __packed btn;
     struct {
         uint8_t axes_addr;
         uint16_t axes[2];
-    } axes;
+    } __packed axes;
 } __packed;
 
 static const uint32_t gp01_mask[4] = {0xBBFF0F0F, 0x00000000, 0x00000000, BR_COMBO_MASK};
@@ -102,6 +102,8 @@ static const uint32_t gp01_mouse_btns_mask[32] = {
 void gp01_init(void) {
     i2c_new_master_bus(&i2c_mst_config, &bus_handle);
     i2c_master_bus_add_device(bus_handle, &dev_cfg, &dev_handle);
+    uint8_t pot_test[] = {0x91, 0x00, 0x80, 0x00, 0x80};
+    i2c_master_transmit(dev_handle, (uint8_t *)pot_test, sizeof(pot_test), -1);
     printf("%s: I2C init done\n", __FUNCTION__);
 }
 
@@ -170,7 +172,7 @@ static void gp01_ctrl_from_generic(struct wired_ctrl *ctrl_data, struct wired_da
                 map_tmp.axes.axes[gp01_axes_idx[i]] = ctrl_data->axes[i].meta->size_min;
             }
             else {
-                map_tmp.axes.axes[gp01_axes_idx[i]] = (uint8_t)(ctrl_data->axes[i].value + ctrl_data->axes[i].meta->neutral);
+                map_tmp.axes.axes[gp01_axes_idx[i]] = (uint16_t)(ctrl_data->axes[i].value + ctrl_data->axes[i].meta->neutral);
             }
             map_tmp.axes.axes[gp01_axes_idx[i]] <<= 6;
         }
