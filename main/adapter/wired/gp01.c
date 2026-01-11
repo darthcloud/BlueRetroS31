@@ -184,6 +184,23 @@ static void gp01_ctrl_from_generic(struct wired_ctrl *ctrl_data, struct wired_da
     i2c_master_transmit(dev_handle, (uint8_t *)&map_tmp.axes, sizeof(map_tmp.axes), -1);
     i2c_master_transmit(dev_handle, (uint8_t *)&map_tmp.btn, sizeof(map_tmp.btn), -1);
 
+    if (ctrl_data->btns[0].value & generic_btns_mask[PAD_LS]) {
+        uint8_t c1r2[] = {0x15, 0xBF};
+        i2c_master_transmit(dev_handle, c1r2, sizeof(c1r2), -1);
+    }
+    else {
+        uint8_t c1r2[] = {0x15, 0x80};
+        i2c_master_transmit(dev_handle, c1r2, sizeof(c1r2), -1);
+    }
+    if (ctrl_data->btns[0].value & generic_btns_mask[PAD_RS]) {
+        uint8_t c3r2[] = {0x17, 0xFC};
+        i2c_master_transmit(dev_handle, c3r2, sizeof(c3r2), -1);
+    }
+    else {
+        uint8_t c3r2[] = {0x17, 0x00};
+        i2c_master_transmit(dev_handle, c3r2, sizeof(c3r2), -1);
+    }
+
     TESTS_CMDS_LOG("\"wired_output\": {\"axes\": [%d, %d], \"btns\": %d},\n",
         map_tmp.axes[gp01_axes_idx[0]], map_tmp.axes[gp01_axes_idx[1]], map_tmp.buttons);
     BT_MON_LOG("\"wired_output\": {\"axes\": [%02X, %02X], \"btns\": %04X},\n",
