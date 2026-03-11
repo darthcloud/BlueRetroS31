@@ -32,13 +32,13 @@ enum {
 static i2c_master_bus_config_t i2c_mst_config = {
     .clk_source = I2C_CLK_SRC_DEFAULT,
     .i2c_port = I2C_NUM_0,
-    .scl_io_num = 19,
-    .sda_io_num = 22,
+    .scl_io_num = 33,
+    .sda_io_num = 4,
     .glitch_ignore_cnt = 7,
 };
 static i2c_device_config_t dev_cfg = {
     .dev_addr_length = I2C_ADDR_BIT_LEN_7,
-    .device_address = 0x08,
+    .device_address = 0x40,
     .scl_speed_hz = 1000000,
 };
 static i2c_master_bus_handle_t bus_handle;
@@ -102,8 +102,10 @@ static const uint32_t gp01_mouse_btns_mask[32] = {
 void gp01_init(void) {
     i2c_new_master_bus(&i2c_mst_config, &bus_handle);
     i2c_master_bus_add_device(bus_handle, &dev_cfg, &dev_handle);
-    uint8_t pot_test[] = {0x91, 0x00, 0x80, 0x00, 0x80};
+    uint8_t pot_test[] = {0x91, 0x00, 0x80};
     i2c_master_transmit(dev_handle, (uint8_t *)pot_test, sizeof(pot_test), -1);
+    //uint8_t epg_test[] = {0xBA, 0xFF};
+    //i2c_master_transmit(dev_handle, (uint8_t *)epg_test, sizeof(epg_test), -1);
     printf("%s: I2C init done\n", __FUNCTION__);
 }
 
@@ -181,25 +183,25 @@ static void gp01_ctrl_from_generic(struct wired_ctrl *ctrl_data, struct wired_da
 
     memcpy(wired_data->output, (void *)&map_tmp, sizeof(map_tmp));
 
-    i2c_master_transmit(dev_handle, (uint8_t *)&map_tmp.axes, sizeof(map_tmp.axes), -1);
-    i2c_master_transmit(dev_handle, (uint8_t *)&map_tmp.btn, sizeof(map_tmp.btn), -1);
+    i2c_master_transmit(dev_handle, (uint8_t *)&map_tmp.axes, 3, -1);
+    //i2c_master_transmit(dev_handle, (uint8_t *)&map_tmp.btn, sizeof(map_tmp.btn), -1);
 
-    if (ctrl_data->btns[0].value & generic_btns_mask[PAD_LS]) {
-        uint8_t c1r2[] = {0x15, 0xBF};
-        i2c_master_transmit(dev_handle, c1r2, sizeof(c1r2), -1);
-    }
-    else {
-        uint8_t c1r2[] = {0x15, 0x80};
-        i2c_master_transmit(dev_handle, c1r2, sizeof(c1r2), -1);
-    }
-    if (ctrl_data->btns[0].value & generic_btns_mask[PAD_RS]) {
-        uint8_t c3r2[] = {0x17, 0xFC};
-        i2c_master_transmit(dev_handle, c3r2, sizeof(c3r2), -1);
-    }
-    else {
-        uint8_t c3r2[] = {0x17, 0x00};
-        i2c_master_transmit(dev_handle, c3r2, sizeof(c3r2), -1);
-    }
+    // if (ctrl_data->btns[0].value & generic_btns_mask[PAD_LS]) {
+    //     uint8_t c1r2[] = {0x15, 0xBF};
+    //     i2c_master_transmit(dev_handle, c1r2, sizeof(c1r2), -1);
+    // }
+    // else {
+    //     uint8_t c1r2[] = {0x15, 0x80};
+    //     i2c_master_transmit(dev_handle, c1r2, sizeof(c1r2), -1);
+    // }
+    // if (ctrl_data->btns[0].value & generic_btns_mask[PAD_RS]) {
+    //     uint8_t c3r2[] = {0x17, 0xFC};
+    //     i2c_master_transmit(dev_handle, c3r2, sizeof(c3r2), -1);
+    // }
+    // else {
+    //     uint8_t c3r2[] = {0x17, 0x00};
+    //     i2c_master_transmit(dev_handle, c3r2, sizeof(c3r2), -1);
+    // }
 
     TESTS_CMDS_LOG("\"wired_output\": {\"axes\": [%d, %d], \"btns\": %d},\n",
         map_tmp.axes[gp01_axes_idx[0]], map_tmp.axes[gp01_axes_idx[1]], map_tmp.buttons);
