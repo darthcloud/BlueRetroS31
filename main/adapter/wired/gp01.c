@@ -17,16 +17,22 @@
 
 #define GP01_AXES_MAX 2
 enum {
-    GP01_T_TRIG = 6,
-    GP01_B_TRIG,
-    GP01_KP1,
-    GP01_KP2,
-    GP01_KP3,
-    GP01_START,
-    GP01_KP4,
-    GP01_KP5,
-    GP01_KP6,
-    GP01_PAUSE,
+    GP00_C0R0 = 8,
+    GP00_C1R0,
+    GP00_C2R0,
+    GP00_C3R0,
+    GP00_C0R1,
+    GP00_C1R1,
+    GP00_C2R1,
+    GP00_C3R1,
+    GP01_C0R0 = 24,
+    GP01_C1R0,
+    GP01_C2R0,
+    GP01_C3R0,
+    GP01_C0R1,
+    GP01_C1R1,
+    GP01_C2R1,
+    GP01_C3R1,
 };
 
 static i2c_master_bus_config_t i2c0_config = {
@@ -79,21 +85,18 @@ static DRAM_ATTR const struct ctrl_meta gp01_axes_meta[GP01_AXES_MAX] =
     {.size_min = -512, .size_max = 511, .neutral = 0x200, .abs_max = 0x1FF, .abs_min = 0x200, .polarity = 1},
 };
 
-static DRAM_ATTR const struct ctrl_meta gp01_mouse_axes_meta[GP01_AXES_MAX] =
-{
-    {.size_min = -512, .size_max = 511, .neutral = 0x200, .abs_max = 0x1FF, .abs_min = 0x200},
-    {.size_min = -512, .size_max = 511, .neutral = 0x200, .abs_max = 0x1FF, .abs_min = 0x200, .polarity = 1},
-};
-
 struct gp01_map {
+    union {
+        struct {
+            uint8_t btn_addr;
+            uint8_t buttons;
+        } __packed btns[2];
+        uint32_t btns_raw;
+    };
     struct {
-        uint8_t btn_addr;
-        uint16_t buttons;
-    } __packed btn;
-    struct {
-        uint8_t axes_addr;
-        uint16_t axes[2];
-    } __packed axes;
+        uint8_t axis_addr;
+        uint16_t axis;
+    } __packed axes[2];
 } __packed;
 
 static const uint32_t gp01_mask[4] = {0xBBFF0F0F, 0x00000000, 0x00000000, BR_COMBO_MASK};
@@ -101,25 +104,12 @@ static const uint32_t gp01_desc[4] = {0x0000000F, 0x00000000, 0x00000000, 0x0000
 static DRAM_ATTR const uint32_t gp01_btns_mask[32] = {
     0, 0, 0, 0,
     0, 0, 0, 0,
-    BIT(GP01_KP4), BIT(GP01_KP6), 0, BIT(GP01_KP2),
-    0, 0, 0, 0,
-    BIT(GP01_T_TRIG), BIT(GP01_KP3), BIT(GP01_B_TRIG), BIT(GP01_KP1),
-    BIT(GP01_START), BIT(GP01_PAUSE), 0, BIT(GP01_KP5),
     0, 0, 0, 0,
     0, 0, 0, 0,
-};
-
-static const uint32_t gp01_mouse_mask[4] = {0x110000F0, 0x00000000, 0x00000000, BR_COMBO_MASK};
-static const uint32_t gp01_mouse_desc[4] = {0x000000F0, 0x00000000, 0x00000000, 0x00000000};
-static const uint32_t gp01_mouse_btns_mask[32] = {
+    BIT(GP00_C0R0), BIT(GP00_C0R1), BIT(GP01_C0R0), BIT(GP01_C0R1),
     0, 0, 0, 0,
     0, 0, 0, 0,
     0, 0, 0, 0,
-    0, 0, 0, 0,
-    0, 0, 0, 0,
-    0, 0, 0, 0,
-    BIT(GP01_T_TRIG), 0, 0, 0,
-    BIT(GP01_B_TRIG), 0, 0, 0,
 };
 
 void gp01_init(void) {
@@ -141,14 +131,14 @@ void IRAM_ATTR gp01_init_buffer(int32_t dev_mode, struct wired_data *wired_data)
     struct gp01_map *map = (struct gp01_map *)wired_data->output;
     struct gp01_map *map_mask = (struct gp01_map *)wired_data->output_mask;
 
-    map->btn.btn_addr = 0x3E;
-    map->btn.buttons = 0x0000;
-    map_mask->btn.buttons = 0xFFFF;
-    map->axes.axes_addr = 0x91;
-    for (uint32_t i = 0; i < GP01_AXES_MAX; i++) {
-        map->axes.axes[gp01_axes_idx[i]] = gp01_axes_meta[i].neutral;
+    for (uint32_t i = 0; i < 2; i++) {
+        map->btns[i].btn_addr = 0x3F;
+        map->btns[i].buttons = 0x00;
+        map_mask->btns[i].buttons = 0xFF;
+        map->axes[i].axis_addr = 0x91;
+        map->axes[i].axis = gp01_axes_meta[i].neutral;
     }
-    memset(map_mask->axes.axes, 0x00, sizeof(map_mask->axes));
+    memset(&map_mask->axes, 0x00, sizeof(map_mask->axes));
 }
 
 void gp01_meta_init(struct wired_ctrl *ctrl_data) {
@@ -157,11 +147,6 @@ void gp01_meta_init(struct wired_ctrl *ctrl_data) {
     for (uint32_t i = 0; i < WIRED_MAX_DEV; i++) {
         for (uint32_t j = 0; j < GP01_AXES_MAX; j++) {
             switch (config.out_cfg[i].dev_mode) {
-                case DEV_MOUSE:
-                    ctrl_data[i].mask = gp01_mouse_mask;
-                    ctrl_data[i].desc = gp01_mouse_desc;
-                    ctrl_data[i].axes[j + 2].meta = &gp01_mouse_axes_meta[j];
-                    break;
                 case DEV_PAD:
                 default:
                     ctrl_data[i].mask = gp01_mask;
@@ -182,12 +167,12 @@ static void gp01_ctrl_from_generic(struct wired_ctrl *ctrl_data, struct wired_da
     for (uint32_t i = 0; i < ARRAY_SIZE(generic_btns_mask); i++) {
         if (ctrl_data->map_mask[0] & generic_btns_mask[i]) {
             if (ctrl_data->btns[0].value & generic_btns_mask[i]) {
-                map_tmp.btn.buttons |= gp01_btns_mask[i];
+                map_tmp.btns_raw |= gp01_btns_mask[i];
                 map_mask &= ~gp01_btns_mask[i];
                 wired_data->cnt_mask[i] = ctrl_data->btns[0].cnt_mask[i];
             }
             else if (map_mask & gp01_btns_mask[i]) {
-                map_tmp.btn.buttons &= ~gp01_btns_mask[i];
+                map_tmp.btns_raw &= ~gp01_btns_mask[i];
                 wired_data->cnt_mask[i] = 0;
             }
         }
@@ -196,40 +181,26 @@ static void gp01_ctrl_from_generic(struct wired_ctrl *ctrl_data, struct wired_da
     for (uint32_t i = 0; i < GP01_AXES_MAX; i++) {
         if (ctrl_data->map_mask[0] & (axis_to_btn_mask(i) & gp01_desc[0])) {
             if (ctrl_data->axes[i].value > ctrl_data->axes[i].meta->size_max) {
-                map_tmp.axes.axes[gp01_axes_idx[i]] = ctrl_data->axes[i].meta->size_max;
+                map_tmp.axes[gp01_axes_idx[i]].axis = ctrl_data->axes[i].meta->size_max;
             }
             else if (ctrl_data->axes[i].value < ctrl_data->axes[i].meta->size_min) {
-                map_tmp.axes.axes[gp01_axes_idx[i]] = ctrl_data->axes[i].meta->size_min;
+                map_tmp.axes[gp01_axes_idx[i]].axis = ctrl_data->axes[i].meta->size_min;
             }
             else {
-                map_tmp.axes.axes[gp01_axes_idx[i]] = (uint16_t)(ctrl_data->axes[i].value + ctrl_data->axes[i].meta->neutral);
+                map_tmp.axes[gp01_axes_idx[i]].axis = (uint16_t)(ctrl_data->axes[i].value + ctrl_data->axes[i].meta->neutral);
             }
-            map_tmp.axes.axes[gp01_axes_idx[i]] <<= 6;
+            map_tmp.axes[gp01_axes_idx[i]].axis <<= 6;
         }
         wired_data->cnt_mask[axis_to_btn_id(i)] = ctrl_data->axes[i].cnt_mask;
     }
 
     memcpy(wired_data->output, (void *)&map_tmp, sizeof(map_tmp));
 
-    i2c_master_transmit(wp00_handle, (uint8_t *)&map_tmp.axes, 3, -1);
-    //i2c_master_transmit(dev_handle, (uint8_t *)&map_tmp.btn, sizeof(map_tmp.btn), -1);
+    i2c_master_transmit(wp00_handle, (uint8_t *)&map_tmp.axes[0], 3, -1);
+    i2c_master_transmit(wp01_handle, (uint8_t *)&map_tmp.axes[1], 3, -1);
+    i2c_master_transmit(wp00_handle, (uint8_t *)&map_tmp.btns[0], sizeof(map_tmp.btns[0]), -1);
+    i2c_master_transmit(wp01_handle, (uint8_t *)&map_tmp.btns[1], sizeof(map_tmp.btns[1]), -1);
 
-    // if (ctrl_data->btns[0].value & generic_btns_mask[PAD_LS]) {
-    //     uint8_t c1r2[] = {0x15, 0xBF};
-    //     i2c_master_transmit(dev_handle, c1r2, sizeof(c1r2), -1);
-    // }
-    // else {
-    //     uint8_t c1r2[] = {0x15, 0x80};
-    //     i2c_master_transmit(dev_handle, c1r2, sizeof(c1r2), -1);
-    // }
-    // if (ctrl_data->btns[0].value & generic_btns_mask[PAD_RS]) {
-    //     uint8_t c3r2[] = {0x17, 0xFC};
-    //     i2c_master_transmit(dev_handle, c3r2, sizeof(c3r2), -1);
-    // }
-    // else {
-    //     uint8_t c3r2[] = {0x17, 0x00};
-    //     i2c_master_transmit(dev_handle, c3r2, sizeof(c3r2), -1);
-    // }
 
     TESTS_CMDS_LOG("\"wired_output\": {\"axes\": [%d, %d], \"btns\": %d},\n",
         map_tmp.axes[gp01_axes_idx[0]], map_tmp.axes[gp01_axes_idx[1]], map_tmp.buttons);
@@ -237,42 +208,9 @@ static void gp01_ctrl_from_generic(struct wired_ctrl *ctrl_data, struct wired_da
         map_tmp.axes[gp01_axes_idx[0]], map_tmp.axes[gp01_axes_idx[1]], map_tmp.buttons);
 }
 
-static void gp01_mouse_from_generic(struct wired_ctrl *ctrl_data, struct wired_data *wired_data) {
-    struct gp01_map map_tmp;
-    int32_t *raw_axes = (int32_t *)(wired_data->output + 4);
-
-    memcpy((void *)&map_tmp, wired_data->output, sizeof(map_tmp));
-
-    for (uint32_t i = 0; i < ARRAY_SIZE(generic_btns_mask); i++) {
-        if (ctrl_data->map_mask[0] & BIT(i)) {
-            if (ctrl_data->btns[0].value & generic_btns_mask[i]) {
-                map_tmp.btn.buttons |= gp01_mouse_btns_mask[i];
-            }
-            else {
-                map_tmp.btn.buttons &= ~gp01_mouse_btns_mask[i];
-            }
-        }
-    }
-
-    for (uint32_t i = 2; i < 4; i++) {
-        if (ctrl_data->map_mask[0] & (axis_to_btn_mask(i) & gp01_mouse_desc[0])) {
-            if (ctrl_data->axes[i].relative) {
-                atomic_add(&raw_axes[gp01_axes_idx[i]], ctrl_data->axes[i].value);
-            }
-            else {
-                raw_axes[gp01_axes_idx[i]] = ctrl_data->axes[i].value;
-            }
-        }
-    }
-
-    memcpy(wired_data->output, (void *)&map_tmp, sizeof(map_tmp) - 8);
-}
-
 void gp01_from_generic(int32_t dev_mode, struct wired_ctrl *ctrl_data, struct wired_data *wired_data) {
     switch (dev_mode) {
         case DEV_MOUSE:
-            gp01_mouse_from_generic(ctrl_data, wired_data);
-            break;
         case DEV_PAD:
         default:
             gp01_ctrl_from_generic(ctrl_data, wired_data);
@@ -300,7 +238,4 @@ void IRAM_ATTR gp01_gen_turbo_mask(struct wired_data *wired_data) {
     struct gp01_map *map_mask = (struct gp01_map *)wired_data->output_mask;
 
     memset(map_mask, 0xFF, sizeof(*map_mask));
-
-    wired_gen_turbo_mask_btns16_pos(wired_data, &map_mask->btn.buttons, gp01_btns_mask);
-    wired_gen_turbo_mask_axes16(wired_data, map_mask->axes.axes, GP01_AXES_MAX, gp01_axes_idx, gp01_axes_meta);
 }
