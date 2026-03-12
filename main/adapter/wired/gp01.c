@@ -128,8 +128,11 @@ void gp01_init(void) {
     i2c_master_bus_add_device(i2c0_handle, &wp1_cfg, &wp01_handle);
     i2c_master_bus_add_device(i2c0_handle, &wp2_cfg, &wp02_handle);
     uint8_t pot_test[] = {0x91, 0x00, 0x80};
+    uint8_t oamp_init[] = {0x3E, 0xC0};
     i2c_master_transmit(wp00_handle, (uint8_t *)pot_test, sizeof(pot_test), -1);
+    i2c_master_transmit(wp00_handle, (uint8_t *)oamp_init, sizeof(oamp_init), -1);
     i2c_master_transmit(wp01_handle, (uint8_t *)pot_test, sizeof(pot_test), -1);
+    i2c_master_transmit(wp01_handle, (uint8_t *)oamp_init, sizeof(oamp_init), -1);
     i2c_master_transmit(wp02_handle, (uint8_t *)pot_test, sizeof(pot_test), -1);
     printf("%s: I2C init done\n", __FUNCTION__);
 }
