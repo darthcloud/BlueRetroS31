@@ -17,7 +17,7 @@
 
 #define GP01_AXES_MAX 2
 enum {
-    GP00_C0R0 = 8,
+    GP00_C0R0 = 0,
     GP00_C1R0,
     GP00_C2R0,
     GP00_C3R0,
@@ -25,7 +25,7 @@ enum {
     GP00_C1R1,
     GP00_C2R1,
     GP00_C3R1,
-    GP01_C0R0 = 24,
+    GP01_C0R0,
     GP01_C1R0,
     GP01_C2R0,
     GP01_C3R0,
@@ -33,6 +33,14 @@ enum {
     GP01_C1R1,
     GP01_C2R1,
     GP01_C3R1,
+    GP02_C0R0,
+    GP02_C1R0,
+    GP02_C2R0,
+    GP02_C3R0,
+    GP02_C0R1,
+    GP02_C1R1,
+    GP02_C2R1,
+    GP02_C3R1,
 };
 
 static i2c_master_bus_config_t i2c0_config = {
@@ -87,10 +95,7 @@ static DRAM_ATTR const struct ctrl_meta gp01_axes_meta[GP01_AXES_MAX] =
 
 struct gp01_map {
     union {
-        struct {
-            uint8_t btn_addr;
-            uint8_t buttons;
-        } __packed btns[2];
+        uint8_t btns[4];
         uint32_t btns_raw;
     };
     struct {
@@ -131,10 +136,9 @@ void IRAM_ATTR gp01_init_buffer(int32_t dev_mode, struct wired_data *wired_data)
     struct gp01_map *map = (struct gp01_map *)wired_data->output;
     struct gp01_map *map_mask = (struct gp01_map *)wired_data->output_mask;
 
+    map->btns_raw = 0x00000000;
+    map_mask->btns_raw = 0xFFFFFFFF;
     for (uint32_t i = 0; i < 2; i++) {
-        map->btns[i].btn_addr = 0x3F;
-        map->btns[i].buttons = 0x00;
-        map_mask->btns[i].buttons = 0xFF;
         map->axes[i].axis_addr = 0x91;
         map->axes[i].axis = gp01_axes_meta[i].neutral;
     }
@@ -198,8 +202,11 @@ static void gp01_ctrl_from_generic(struct wired_ctrl *ctrl_data, struct wired_da
 
     i2c_master_transmit(wp00_handle, (uint8_t *)&map_tmp.axes[0], 3, -1);
     i2c_master_transmit(wp01_handle, (uint8_t *)&map_tmp.axes[1], 3, -1);
-    i2c_master_transmit(wp00_handle, (uint8_t *)&map_tmp.btns[0], sizeof(map_tmp.btns[0]), -1);
-    i2c_master_transmit(wp01_handle, (uint8_t *)&map_tmp.btns[1], sizeof(map_tmp.btns[1]), -1);
+    uint8_t gp_btns[2] = {0x3F, 0x00};
+    gp_btns[1] = map_tmp.btns[0];
+    i2c_master_transmit(wp00_handle, gp_btns, 2, -1);
+    gp_btns[1] = map_tmp.btns[1];
+    i2c_master_transmit(wp01_handle, gp_btns, 2, -1);
 
 
     TESTS_CMDS_LOG("\"wired_output\": {\"axes\": [%d, %d], \"btns\": %d},\n",
