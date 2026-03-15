@@ -89,7 +89,7 @@ static DRAM_ATTR const uint8_t gp01_axes_idx[ADAPTER_MAX_AXES] =
 
 static DRAM_ATTR const struct ctrl_meta gp01_axes_meta[GP01_AXES_MAX] =
 {
-    {.size_min = -512, .size_max = 511, .neutral = 0x200, .abs_max = 0x1FF, .abs_min = 0x200},
+    {.size_min = -512, .size_max = 511, .neutral = 0x200, .abs_max = 0x1FF, .abs_min = 0x200, .polarity = 1},
     {.size_min = -512, .size_max = 511, .neutral = 0x200, .abs_max = 0x1FF, .abs_min = 0x200, .polarity = 1},
 };
 
@@ -111,7 +111,7 @@ static DRAM_ATTR const uint32_t gp01_btns_mask[32] = {
     0, 0, 0, 0,
     0, 0, 0, 0,
     0, 0, 0, 0,
-    BIT(GP00_C0R0), BIT(GP00_C0R1), BIT(GP01_C0R0), BIT(GP01_C0R1),
+    BIT(GP01_C0R0), BIT(GP00_C0R0), BIT(GP01_C0R1), BIT(GP00_C0R1),
     0, 0, 0, 0,
     0, 0, 0, 0,
     0, 0, 0, 0,
