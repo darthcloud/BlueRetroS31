@@ -34,7 +34,7 @@
 #include <esp32/rom/uart.h>
 #include <esp32/rom/cache.h>
 #include <xt_instr_macros.h>
-#include <xtensa/config/specreg.h>
+#include <xtensa/config/xt_specreg.h>
 #include <xtensa_api.h>
 #include <xtensa/config/core.h>
 
@@ -107,7 +107,7 @@ static inline void cpu_init_hwloop(void)
 {
 #if XCHAL_ERRATUM_572
     uint32_t memctl = XCHAL_CACHE_MEMCTL_DEFAULT;
-    WSR(MEMCTL, memctl);
+    WSR(XT_REG_MEMCTL, memctl);
 #endif // XCHAL_ERRATUM_572
 }
 

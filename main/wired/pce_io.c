@@ -363,7 +363,7 @@ void pce_io_init(uint32_t package) {
 
     /* OE */
     if (config.global_cfg.multitap_cfg == MT_SLOT_1 || config.out_cfg[0].dev_mode != DEV_PAD) {
-        io_conf.intr_type = GPIO_PIN_INTR_POSEDGE;
+        io_conf.intr_type = GPIO_INTR_POSEDGE;
     }
     else {
         io_conf.intr_type = GPIO_INTR_DISABLE;

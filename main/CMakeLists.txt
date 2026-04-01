@@ -144,6 +144,7 @@ set(components
     "esp_driver_rmt"
     "esp_driver_spi"
     "esp_driver_uart"
+    "esp_hal_clock"
     "esp_ringbuf"
     "esp_timer"
     "nvs_flash"

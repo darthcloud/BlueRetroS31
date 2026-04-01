@@ -195,34 +195,34 @@ void real_spi_init(uint32_t package) {
 
     /* CS Generator loopback */
     io_conf.mode = GPIO_MODE_OUTPUT;
-    io_conf.intr_type = GPIO_PIN_INTR_DISABLE;
+    io_conf.intr_type = GPIO_INTR_DISABLE;
     io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
     io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
     io_conf.pin_bit_mask = 1ULL << P1_CS_OUT_PIN;
     gpio_config_iram(&io_conf);
 
     io_conf.mode = GPIO_MODE_INPUT;
-    io_conf.intr_type = GPIO_PIN_INTR_DISABLE;
+    io_conf.intr_type = GPIO_INTR_DISABLE;
     io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
     io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
     io_conf.pin_bit_mask = 1ULL << P1_CS_IN_PIN;
     gpio_config_iram(&io_conf);
-    gpio_matrix_in(P1_CS_IN_PIN, HSPICS0_IN_IDX, false);
+    rom_gpio_matrix_in(P1_CS_IN_PIN, HSPICS0_IN_IDX, false);
 
     /* RXD */
     gpio_set_level_iram(P1_RXD_PIN, 1);
     gpio_set_direction_iram(P1_RXD_PIN, GPIO_MODE_OUTPUT);
-    gpio_matrix_out(P1_RXD_PIN, HSPIQ_OUT_IDX, false, false);
+    rom_gpio_matrix_out(P1_RXD_PIN, HSPIQ_OUT_IDX, false, false);
     PIN_FUNC_SELECT(GPIO_PIN_MUX_REG_IRAM[P1_RXD_PIN], PIN_FUNC_GPIO);
 
     /* SCK */
     io_conf.mode = GPIO_MODE_INPUT;
-    io_conf.intr_type = GPIO_PIN_INTR_DISABLE;
+    io_conf.intr_type = GPIO_INTR_DISABLE;
     io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
     io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
     io_conf.pin_bit_mask = 1ULL << P1_SCK_PIN;
     gpio_config_iram(&io_conf);
-    gpio_matrix_in(P1_SCK_PIN, HSPICLK_IN_IDX, false);
+    rom_gpio_matrix_in(P1_SCK_PIN, HSPICLK_IN_IDX, false);
 
     periph_ll_enable_clk_clear_rst(PERIPH_HSPI_MODULE);
 

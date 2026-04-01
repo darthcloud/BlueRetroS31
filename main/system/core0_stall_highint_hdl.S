@@ -50,7 +50,7 @@ xt_highint5:
     extui   a0, a0, 31, 1
     bnez    a0, .handle_dport_access_int
 
-    rsr     a0, EXCSAVE_5                   /* restore a0 */
+    rsr     a0, XT_REG_EXCSAVE_5                   /* restore a0 */
     rfi     5
 
     .align      4
@@ -99,7 +99,7 @@ xt_highint5:
     l32i    a4, a0, L5_INTR_A4_OFFSET
     rsync                                   /* ensure register restored */
 
-    rsr     a0, EXCSAVE_5                   /* restore a0 */
+    rsr     a0, XT_REG_EXCSAVE_5                   /* restore a0 */
     rfi     5
 
 /* The linker has no reason to link in this file; all symbols it exports are already defined

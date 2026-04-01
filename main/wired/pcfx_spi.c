@@ -198,27 +198,27 @@ void pcfx_spi_init(uint32_t package) {
 
         /* Latch */
         io_conf.mode = GPIO_MODE_INPUT;
-        io_conf.intr_type = GPIO_PIN_INTR_NEGEDGE;
+        io_conf.intr_type = GPIO_INTR_NEGEDGE;
         io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
         io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
         io_conf.pin_bit_mask = 1ULL << p->latch_pin;
         gpio_config_iram(&io_conf);
-        gpio_matrix_in(p->latch_pin, p->latch_sig, true); // Invert latch to use as CS
+        rom_gpio_matrix_in(p->latch_pin, p->latch_sig, true); // Invert latch to use as CS
 
         /* Data */
         gpio_set_level_iram(p->data_pin, 1);
         gpio_set_direction_iram(p->data_pin, GPIO_MODE_OUTPUT);
-        gpio_matrix_out(p->data_pin, p->data_sig, true, false); // PCFX data is inverted
+        rom_gpio_matrix_out(p->data_pin, p->data_sig, true, false); // PCFX data is inverted
         PIN_FUNC_SELECT(GPIO_PIN_MUX_REG_IRAM[p->data_pin], PIN_FUNC_GPIO);
 
         /* Clock */
         io_conf.mode = GPIO_MODE_INPUT;
-        io_conf.intr_type = GPIO_PIN_INTR_DISABLE;
+        io_conf.intr_type = GPIO_INTR_DISABLE;
         io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
         io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
         io_conf.pin_bit_mask = 1ULL << p->clk_pin;
         gpio_config_iram(&io_conf);
-        gpio_matrix_in(p->clk_pin, p->clk_sig, true);
+        rom_gpio_matrix_in(p->clk_pin, p->clk_sig, true);
 
         periph_ll_enable_clk_clear_rst(p->spi_mod);
 

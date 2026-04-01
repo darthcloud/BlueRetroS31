@@ -19,7 +19,8 @@
 #include "esp_attr.h"
 #include "esp_bit_defs.h"
 #include "hal/gpio_ll.h"
-#include "soc/rtc_io_periph.h"
+#include "hal/rtc_io_periph.h"
+#include "soc/rtc_io_channel.h"
 #include "gpio.h"
 
 typedef struct {
@@ -270,7 +271,7 @@ int32_t gpio_set_direction_iram(gpio_num_t gpio_num, gpio_mode_t mode)
         gpio_ll_output_enable(&GPIO, gpio_num);
     } else {
         gpio_ll_output_disable(&GPIO, gpio_num);
-        gpio_ll_matrix_out_default(&GPIO, gpio_num);
+        gpio_ll_set_output_signal_matrix_source(&GPIO, gpio_num, SIG_GPIO_OUT_IDX, false);
     }
 
     if (mode & GPIO_MODE_DEF_OD) {
@@ -330,7 +331,7 @@ int32_t gpio_config_iram(const gpio_config_t *pGPIOConfig)
                 gpio_ll_output_enable(&GPIO, io_num);
             } else {
                 gpio_ll_output_disable(&GPIO, io_num);
-                gpio_ll_matrix_out_default(&GPIO, io_num);
+                gpio_ll_set_output_signal_matrix_source(&GPIO, io_num, SIG_GPIO_OUT_IDX, false);
             }
 
             if (pGPIOConfig->pull_up_en) {

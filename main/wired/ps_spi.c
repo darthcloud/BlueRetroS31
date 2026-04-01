@@ -235,7 +235,7 @@ static void set_output_state(uint32_t port, uint32_t enable) {
         if (enable) {
             gpio_set_direction_iram(P1_DSR_PIN, GPIO_MODE_OUTPUT_OD);
             gpio_set_direction_iram(P1_RXD_PIN, GPIO_MODE_OUTPUT_OD);
-            gpio_matrix_out(P1_RXD_PIN, HSPIQ_OUT_IDX, false, false);
+            rom_gpio_matrix_out(P1_RXD_PIN, HSPIQ_OUT_IDX, false, false);
         }
         else {
             gpio_set_direction_iram(P1_RXD_PIN, GPIO_MODE_INPUT);
@@ -246,7 +246,7 @@ static void set_output_state(uint32_t port, uint32_t enable) {
         if (enable) {
             gpio_set_direction_iram(P2_DSR_PIN, GPIO_MODE_OUTPUT_OD);
             gpio_set_direction_iram(P2_RXD_PIN, GPIO_MODE_OUTPUT_OD);
-            gpio_matrix_out(P2_RXD_PIN, VSPIQ_OUT_IDX, false, false);
+            rom_gpio_matrix_out(P2_RXD_PIN, VSPIQ_OUT_IDX, false, false);
         }
         else {
             gpio_set_direction_iram(P2_RXD_PIN, GPIO_MODE_INPUT);
@@ -1014,21 +1014,21 @@ inner_break:
     /* TXD */
     gpio_set_pull_mode_iram(P1_TXD_PIN, GPIO_PULLUP_ONLY);
     gpio_set_direction_iram(P1_TXD_PIN, GPIO_MODE_INPUT);
-    gpio_matrix_in(P1_TXD_PIN, HSPID_IN_IDX, false);
+    rom_gpio_matrix_in(P1_TXD_PIN, HSPID_IN_IDX, false);
     PIN_FUNC_SELECT(GPIO_PIN_MUX_REG_IRAM[P1_TXD_PIN], PIN_FUNC_GPIO);
     gpio_set_pull_mode_iram(P2_TXD_PIN, GPIO_PULLUP_ONLY);
     gpio_set_direction_iram(P2_TXD_PIN, GPIO_MODE_INPUT);
-    gpio_matrix_in(P2_TXD_PIN, VSPID_IN_IDX, false);
+    rom_gpio_matrix_in(P2_TXD_PIN, VSPID_IN_IDX, false);
     PIN_FUNC_SELECT(GPIO_PIN_MUX_REG_IRAM[P2_TXD_PIN], PIN_FUNC_GPIO);
 
     /* SCK */
     gpio_set_pull_mode_iram(P1_SCK_PIN, GPIO_PULLUP_ONLY);
     gpio_set_direction_iram(P1_SCK_PIN, GPIO_MODE_INPUT);
-    gpio_matrix_in(P1_SCK_PIN, HSPICLK_IN_IDX, false);
+    rom_gpio_matrix_in(P1_SCK_PIN, HSPICLK_IN_IDX, false);
     PIN_FUNC_SELECT(GPIO_PIN_MUX_REG_IRAM[P1_SCK_PIN], PIN_FUNC_GPIO);
     gpio_set_pull_mode_iram(P2_SCK_PIN, GPIO_PULLUP_ONLY);
     gpio_set_direction_iram(P2_SCK_PIN, GPIO_MODE_INPUT);
-    gpio_matrix_in(P2_SCK_PIN, VSPICLK_IN_IDX, false);
+    rom_gpio_matrix_in(P2_SCK_PIN, VSPICLK_IN_IDX, false);
     PIN_FUNC_SELECT(GPIO_PIN_MUX_REG_IRAM[P2_SCK_PIN], PIN_FUNC_GPIO);
 
     periph_ll_enable_clk_clear_rst(PERIPH_HSPI_MODULE);
@@ -1052,18 +1052,18 @@ void ps_spi_port_cfg(uint16_t mask) {
         if (mask & 0x1) {
             gpio_config_t io_conf = {
                 .mode = GPIO_MODE_INPUT,
-                .intr_type = GPIO_PIN_INTR_POSEDGE,
+                .intr_type = GPIO_INTR_POSEDGE,
                 .pull_down_en = GPIO_PULLDOWN_DISABLE,
                 .pull_up_en = GPIO_PULLUP_DISABLE,
             };
 
             io_conf.pin_bit_mask = 1ULL << gpio_pin[i];
             gpio_config_iram(&io_conf);
-            gpio_matrix_in(gpio_pin[i], signals[i], 0);
+            rom_gpio_matrix_in(gpio_pin[i], signals[i], 0);
         }
         else {
             gpio_reset_iram(gpio_pin[i]);
-            gpio_matrix_in(GPIO_MATRIX_CONST_ONE_INPUT, signals[i], 0);
+            rom_gpio_matrix_in(GPIO_MATRIX_CONST_ONE_INPUT, signals[i], 0);
         }
         mask >>= 1;
     }

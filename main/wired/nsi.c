@@ -6,7 +6,6 @@
 #include <string.h>
 #include "soc/io_mux_reg.h"
 #include "soc/gpio_pins.h"
-#include <hal/clk_gate_ll.h>
 #include <soc/rmt_struct.h>
 #include <hal/rmt_types.h>
 #include <hal/rmt_ll.h>
@@ -21,6 +20,7 @@
 #include "adapter/wired/gc.h"
 #include "system/gpio.h"
 #include "system/intr.h"
+#include "system/clk_gate_ll.h"
 #include "nsi.h"
 
 #define BIT_ZERO 0x80020006
@@ -47,7 +47,7 @@
 typedef struct {
     struct {
         rmt_symbol_word_t data32[SOC_RMT_MEM_WORDS_PER_CHANNEL];
-    } chan[SOC_RMT_CHANNELS_PER_GROUP];
+    } chan[RMT_LL_GET(CHANS_PER_INST)];
 } rmt_mem_t;
 
 // RMTMEM address is declared in <target>.peripherals.ld
@@ -726,12 +726,12 @@ void nsi_port_cfg(uint16_t mask) {
             PIN_FUNC_SELECT(GPIO_PIN_MUX_REG_IRAM[gpio_pin[i]], PIN_FUNC_GPIO);
             /* Bidirectional open-drain */
             gpio_set_direction_iram(gpio_pin[i], GPIO_MODE_INPUT_OUTPUT_OD);
-            gpio_matrix_out(gpio_pin[i], RMT_SIG_OUT0_IDX + rmt_ch[i][system], 0, 0);
-            gpio_matrix_in(gpio_pin[i], RMT_SIG_IN0_IDX + rmt_ch[i][system], 0);
+            rom_gpio_matrix_out(gpio_pin[i], RMT_SIG_OUT0_IDX + rmt_ch[i][system], 0, 0);
+            rom_gpio_matrix_in(gpio_pin[i], RMT_SIG_IN0_IDX + rmt_ch[i][system], 0);
         }
         else {
             gpio_reset_iram(gpio_pin[i]);
-            gpio_matrix_in(GPIO_MATRIX_CONST_ONE_INPUT, RMT_SIG_IN0_IDX + rmt_ch[i][system], 0);
+            rom_gpio_matrix_in(GPIO_MATRIX_CONST_ONE_INPUT, RMT_SIG_IN0_IDX + rmt_ch[i][system], 0);
         }
         mask >>= 1;
     }

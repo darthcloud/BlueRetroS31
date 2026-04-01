@@ -14,6 +14,7 @@
 #include <soc/efuse_reg.h>
 #include "driver/gpio.h"
 #include "hal/ledc_hal.h"
+#include "hal/ledc_periph.h"
 #include "hal/gpio_hal.h"
 #include "driver/ledc.h"
 #include "esp_rom_gpio.h"

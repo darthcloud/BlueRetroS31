@@ -73,13 +73,13 @@ int32_t fpga_config(void) {
         return ret;
     }
 
-    ret = spi_bus_initialize(HSPI_HOST, &buscfg, SPI_DMA_CH_AUTO);
+    ret = spi_bus_initialize(SPI2_HOST, &buscfg, SPI_DMA_CH_AUTO);
     if (ret) {
         printf("# %s: spi bus init fail\n", __FUNCTION__);
         goto release_mem;
     }
 
-    ret = spi_bus_add_device(HSPI_HOST, &devcfg, &spi);
+    ret = spi_bus_add_device(SPI2_HOST, &devcfg, &spi);
     if (ret) {
         goto release_bus;
     }
@@ -140,7 +140,7 @@ close_file:
 
     (void)spi_bus_remove_device(spi);
 release_bus:
-    (void)spi_bus_free(HSPI_HOST);
+    (void)spi_bus_free(SPI2_HOST);
 release_mem:
     if (buffer) {
         free(buffer);
