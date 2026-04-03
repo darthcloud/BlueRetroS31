@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include "led.h"
+#if 0
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <soc/efuse_reg.h>
@@ -10,7 +12,6 @@
 #include "system/gpio.h"
 #include "driver/ledc.h"
 #include "adapter/config.h"
-#include "led.h"
 
 #ifndef LEDC_HIGH_SPEED_MODE
 #define LEDC_HIGH_SPEED_MODE LEDC_LOW_SPEED_MODE
@@ -51,8 +52,10 @@ static void err_led_task(void *param) {
         }
     }
 }
+#endif
 
 void err_led_init(uint32_t package) {
+#if 0
     ledc_timer_config_t ledc_timer = {
         .duty_resolution = LEDC_TIMER_13_BIT,
         .freq_hz = hw_config.led_pulse_hz,
@@ -83,30 +86,43 @@ void err_led_init(uint32_t package) {
 
     xTaskCreatePinnedToCore(&err_led_task, "err_led_task", 768, NULL, 5, &err_led_task_hdl, 0);
     err_led_clear();
+#endif
 }
 
 void err_led_cfg_update(void) {
+#if 0
     ledc_set_freq(LEDC_HIGH_SPEED_MODE, LEDC_TIMER_0, hw_config.led_pulse_hz);
+#endif
 }
 
 void err_led_set(void) {
+#if 0
     vTaskSuspend(err_led_task_hdl);
     ledc_set_duty_and_update(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_0, hw_config.led_pulse_on_duty_cycle, 0);
     atomic_set_bit(&led_flags, ERR_LED_SET);
+#endif
 }
 
 void err_led_clear(void) {
+#if 0
     /* When error is set it stay on until power cycle */
     if (!atomic_test_bit(&led_flags, ERR_LED_SET)) {
         vTaskSuspend(err_led_task_hdl);
         ledc_set_duty_and_update(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_0, hw_config.led_pulse_off_duty_cycle, 0);
     }
+#endif
 }
 
 void err_led_pulse(void) {
+#if 0
     vTaskResume(err_led_task_hdl);
+#endif
 }
 
 uint32_t err_led_get_pin(void) {
+#if 0
     return err_led_pin;
+#else
+    return 2;
+#endif
 }
