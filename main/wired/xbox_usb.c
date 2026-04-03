@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include "xbox_usb.h"
+#if 0
 #include <stdio.h>
 #include "esp_mac.h"
 #include "tinyusb.h"
@@ -10,7 +12,6 @@
 #include "adapter/adapter.h"
 #include "adapter/wired/xbox.h"
 #include "adapter/config.h"
-#include "xbox_usb.h"
 
 #define XBOX_INTERFACE_CLASS 88
 #define XBOX_INTERFACE_SUBCLASS 66
@@ -194,9 +195,11 @@ bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_requ
     }
     return true;
 }
+#endif
 
 void xbox_init(void)
 {
+#if 0
     const tinyusb_config_t tusb_cfg = {
         .device_descriptor = &device_desc,
         .string_descriptor = hid_string_desc,
@@ -214,9 +217,11 @@ void xbox_init(void)
     ep_in_buf[1] = XBOX_REPORT_IN_SIZE;
 
     tinyusb_driver_install(&tusb_cfg);
+#endif
 }
 
 void xbox_send_report(void) {
+#if 0
     if (tud_ready() && !usbd_edpt_busy(0, ep_in)) {
         /* Buttons */
         ep_in_buf[2] = wired_adapter.data[0].output[2]
@@ -233,12 +238,15 @@ void xbox_send_report(void) {
             & wired_adapter.data[0].output_mask32[4];
         usbd_edpt_xfer(0, ep_in, ep_in_buf, XBOX_REPORT_IN_SIZE);
     }
+#endif
 }
 
 void xbox_get_report(void) {
+#if 0
     if (tud_ready() && !usbd_edpt_busy(0, ep_out)) {
         usbd_edpt_xfer(0, ep_out, ep_out_buf, XBOX_REPORT_OUT_SIZE);
     }
+#endif
 }
 
 void xbox_port_cfg(uint16_t mask) {

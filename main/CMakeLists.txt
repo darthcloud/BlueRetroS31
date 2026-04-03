@@ -186,7 +186,7 @@ endif()
 if(CONFIG_IDF_TARGET_ESP32S2)
     idf_build_set_property(COMPILE_DEFINITIONS "-DCONFIG_ATOMIC_OPERATIONS_BUILTIN" APPEND)
 
-    create_esp_enc_img(${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}.bin
-        ${embed} ${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}_secure.bin app)
+    #create_esp_enc_img(${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}.bin
+    #    ${embed} ${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}_secure.bin app)
 endif()
 
