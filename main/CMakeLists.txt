@@ -53,7 +53,6 @@ set(cov_srcs
     "bluetooth/hidp/ps.c"
     "bluetooth/hidp/sw.c"
     "bluetooth/hidp/sw2.c"
-    "system/manager.c"
     "tools/ps1_gameid.c"
 )
 
@@ -70,42 +69,14 @@ if(CONFIG_BLUERETRO_BT_EXTERNAL_H4)
 endif()
 
 set(srcs
-    "adapter/adapter_debug.c"
-    #"bluetooth/debug.c"
-    "system/fpga_config.c"
     "system/fs.c"
-    "system/led.c"
-    "tools/stats.c"
     "wired/wired_common.c"
     "wired/wired_rtos.c"
     "wired/parallel.c"
-    "wired/sea_io.c"
 )
 
 if(CONFIG_IDF_TARGET_ESP32)
     list(APPEND srcs
-        "wired/detect.c"
-        "wired/wired_bare.c"
-        "wired/npiso_io.c"
-        "wired/cdi_uart.c"
-        "wired/pce_io.c"
-        "wired/sega_io.c"
-        "wired/nsi.c"
-        "wired/maple.c"
-        "wired/jvs_uart.c"
-        "wired/pcfx_spi.c"
-        "wired/ps_spi.c"
-        "wired/real_spi.c"
-        "wired/snes_spi.c"
-        "wired/jag_io.c"
-        "wired/wii_i2c.c"
-        "system/bare_metal_app_cpu.c"
-        "system/core0_stall.c"
-        "system/core0_stall_highint_hdl.S"
-        "system/gpio.c"
-        "system/intr.c"
-        "system/startup.c"
-        "zephyr/atomic.S"
     )
 endif()
 
@@ -148,8 +119,6 @@ set(components
     "esp_timer"
     "nvs_flash"
     "spiffs"
-
-    "queue_bss"
 )
 
 idf_component_register(
