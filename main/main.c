@@ -10,9 +10,9 @@
 #include <esp_ota_ops.h>
 #include <soc/efuse_reg.h>
 #include <esp_efuse.h>
+#include <esp_rom_sys.h>
 #include "system/bare_metal_app_cpu.h"
 #include "system/core0_stall.h"
-#include "system/delay.h"
 #include "system/fs.h"
 #include "system/led.h"
 #include "adapter/adapter.h"
@@ -46,7 +46,7 @@ static void wired_init_task(void) {
             && config.global_cfg.system_cfg != WIRED_AUTO) {
             break;
         }
-        delay_us(1000);
+        esp_rom_delay_us(1000);
     }
     detect_deinit();
 
@@ -56,7 +56,7 @@ static void wired_init_task(void) {
 #endif
 
     while (config.magic != CONFIG_MAGIC) {
-        delay_us(1000);
+        esp_rom_delay_us(1000);
     }
 #endif /* CONFIG_IDF_TARGET_ESP32S2 */
 

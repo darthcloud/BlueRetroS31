@@ -71,7 +71,7 @@ endif()
 
 set(srcs
     "adapter/adapter_debug.c"
-    "bluetooth/debug.c"
+    #"bluetooth/debug.c"
     "system/fpga_config.c"
     "system/fs.c"
     "system/led.c"
@@ -102,7 +102,6 @@ if(CONFIG_IDF_TARGET_ESP32)
         "system/bare_metal_app_cpu.c"
         "system/core0_stall.c"
         "system/core0_stall_highint_hdl.S"
-        "system/delay.c"
         "system/gpio.c"
         "system/intr.c"
         "system/startup.c"
