@@ -80,7 +80,7 @@ if(CONFIG_IDF_TARGET_ESP32)
     )
 endif()
 
-if(CONFIG_IDF_TARGET_ESP32S2)
+if(CONFIG_BLUERETRO_SYSTEM_XBOX)
     list(APPEND srcs
         "wired/xbox_usb.c"
     )
@@ -99,9 +99,9 @@ if(CONFIG_BLUERETRO_COVERAGE)
     )
 endif()
 
-set(embed
-    ${project_dir}/keys/xbox.pem
-)
+#set(embed
+#    ${project_dir}/keys/xbox.pem
+#)
 
 set(components
     "app_update"
@@ -144,12 +144,6 @@ if(CONFIG_BLUERETRO_COVERAGE)
 endif()
 
 idf_build_set_property(COMPILE_DEFINITIONS "-DBLUERETRO" APPEND)
-
-if(CONFIG_IDF_TARGET_ESP32)
-    idf_build_set_property(COMPILE_DEFINITIONS "-DXT_INTEXC_HOOKS" APPEND)
-    target_link_libraries(${COMPONENT_TARGET} "-u ld_include_my_startup_file")
-    target_link_libraries(${COMPONENT_TARGET} "-u ld_include_core0_stall_highint_hdl")
-endif()
 
 if(CONFIG_IDF_TARGET_ESP32S2)
     idf_build_set_property(COMPILE_DEFINITIONS "-DCONFIG_ATOMIC_OPERATIONS_BUILTIN" APPEND)
