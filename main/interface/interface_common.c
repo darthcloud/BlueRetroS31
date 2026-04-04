@@ -7,7 +7,6 @@
 #include <stddef.h>
 #include "adapter/adapter.h"
 #include "interface_common.h"
-#include "parallel.h"
 #include "wavepak_vx.h"
 #include "xbox_usb.h"
 
@@ -24,5 +23,7 @@ const char *interface_get_sys_name(void) {
     return "VECTREX";
 #elif defined(CONFIG_BLUERETRO_SYSTEM_XBOX)
     return "XBOX";
+#else
+    return "NONE";
 #endif
 }

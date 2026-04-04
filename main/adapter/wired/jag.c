@@ -12,7 +12,6 @@
 #include "bluetooth/mon.h"
 #include "jag.h"
 #include "driver/gpio.h"
-#include "wired/jag_io.h"
 
 #define P1_J0_PIN 32
 #define P1_J1_PIN 33

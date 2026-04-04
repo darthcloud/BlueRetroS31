@@ -15,7 +15,6 @@
 #include "system/fs.h"
 #include "adapter/gameid.h"
 #include "bluetooth/mon.h"
-#include "system/manager.h"
 
 struct config config;
 struct hw_config hw_config = {
@@ -373,6 +372,7 @@ static int32_t config_store_on_file(struct config *data, char *filename) {
     return ret;
 }
 
+#if 0
 static bool config_is_rst_required(void) {
     static uint32_t magic = 0;
     static uint8_t multitap_cfg = 0;
@@ -397,7 +397,8 @@ static bool config_is_rst_required(void) {
     magic = config.magic;
 
     return ret;
-} 
+}
+#endif
 
 void IRAM_ATTR config_set_rst_bare_core(bool value) {
     config_rst_bare_core = value;
@@ -446,10 +447,12 @@ void config_init(uint32_t src) {
     }
 
     config_load_from_file(&config, filename);
+#if 0
     if (config_rst_bare_core && config_is_rst_required()) {
         sys_mgr_cmd(SYS_MGR_CMD_WIRED_RST);
         printf("# %s: Reloaded wired core cfg: %s\n", __FUNCTION__, filename);
     }
+#endif
 }
 
 void config_update(uint32_t dst) {
@@ -465,10 +468,12 @@ void config_update(uint32_t dst) {
     }
 
     config_store_on_file(&config, filename);
+#if 0
     if (config_rst_bare_core && config_is_rst_required()) {
         sys_mgr_cmd(SYS_MGR_CMD_WIRED_RST);
         printf("# %s: Reloaded wired core cfg: %s\n", __FUNCTION__, filename);
     }
+#endif
 }
 
 uint32_t config_get_src(void) {

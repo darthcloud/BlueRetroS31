@@ -9,7 +9,6 @@
 #include "adapter/config.h"
 #include "adapter/kb_monitor.h"
 #include "adapter/wired/wired.h"
-#include "system/manager.h"
 #include "tests/cmds.h"
 #include "bluetooth/mon.h"
 #include "saturn.h"
@@ -168,7 +167,7 @@ static void saturn_ctrl_special_action(struct wired_ctrl *ctrl_data, struct wire
 
                 config.out_cfg[ctrl_data->index].dev_mode &= 0x01;
                 config.out_cfg[ctrl_data->index].dev_mode ^= 0x01;
-                sys_mgr_cmd(SYS_MGR_CMD_WIRED_RST);
+                //sys_mgr_cmd(SYS_MGR_CMD_WIRED_RST);
             }
         }
     }

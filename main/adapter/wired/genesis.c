@@ -6,7 +6,6 @@
 #include <string.h>
 #include "adapter/config.h"
 #include "adapter/wired/wired.h"
-#include "system/manager.h"
 #include "zephyr/types.h"
 #include "tools/util.h"
 #include "tests/cmds.h"
@@ -225,7 +224,7 @@ static void genesis_ctrl_special_action(struct wired_ctrl *ctrl_data, struct wir
 
                 config.out_cfg[ctrl_data->index].dev_mode &= 0x01;
                 config.out_cfg[ctrl_data->index].dev_mode ^= 0x01;
-                sys_mgr_cmd(SYS_MGR_CMD_WIRED_RST);
+                //sys_mgr_cmd(SYS_MGR_CMD_WIRED_RST);
             }
         }
     }

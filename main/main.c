@@ -33,7 +33,7 @@ void app_main()
 
     interface_init();
 
-    printf("# SYSTEM FW: %s\n", wired_get_sys_name());
+    printf("# SYSTEM FW: %s\n", interface_get_sys_name());
 
     running = esp_ota_get_running_partition();
     esp_ota_img_states_t ota_state;
@@ -46,7 +46,6 @@ void app_main()
 
 #ifndef CONFIG_BLUERETRO_QEMU
     if (fs_init()) {
-        err_led_set();
         err = 1;
         printf("FS init fail!\n");
     }

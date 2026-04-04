@@ -12,8 +12,6 @@
 #include "tests/cmds.h"
 #include "bluetooth/mon.h"
 #include "npiso.h"
-#include "soc/gpio_struct.h"
-#include "driver/gpio.h"
 
 #define VTAP_PAL_PIN 16
 #define VTAP_MODE_PIN 27
@@ -288,6 +286,7 @@ void npiso_meta_init(struct wired_ctrl *ctrl_data) {
 }
 
 static void npiso_vtap_gpio(struct wired_ctrl *ctrl_data, struct wired_data *wired_data) {
+#if 0
     /* Palette */
     if (ctrl_data->map_mask[0] & generic_btns_mask[PAD_LJ]) {
         if (ctrl_data->btns[0].value & generic_btns_mask[PAD_LJ]) {
@@ -318,6 +317,7 @@ static void npiso_vtap_gpio(struct wired_ctrl *ctrl_data, struct wired_data *wir
             }
         }
     }
+#endif
 }
 
 static void npiso_ctrl_from_generic(struct wired_ctrl *ctrl_data, struct wired_data *wired_data) {

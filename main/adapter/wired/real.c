@@ -8,7 +8,6 @@
 #include "tools/util.h"
 #include "adapter/config.h"
 #include "adapter/wired/wired.h"
-#include "system/manager.h"
 #include "tests/cmds.h"
 #include "bluetooth/mon.h"
 #include "real.h"
@@ -141,7 +140,7 @@ static void real_ctrl_special_action(struct wired_ctrl *ctrl_data, struct wired_
 
                 config.out_cfg[ctrl_data->index].dev_mode &= 0x01;
                 config.out_cfg[ctrl_data->index].dev_mode ^= 0x01;
-                sys_mgr_cmd(SYS_MGR_CMD_WIRED_RST);
+                //sys_mgr_cmd(SYS_MGR_CMD_WIRED_RST);
             }
         }
     }
