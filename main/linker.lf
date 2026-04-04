@@ -3,8 +3,7 @@ archive: libmain.a
 entries:
     main (noflash)
     devcrypto (noflash)
-    interface (noflash)
-    parallel (noflash)
+    interface_common (noflash)
     wavepak_vx (noflash)
     xbox_usb (noflash)
 
