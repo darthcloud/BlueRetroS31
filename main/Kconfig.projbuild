@@ -52,14 +52,14 @@ menu "BlueRetro"
 
     choice BLUERETRO_SYSTEM_INTERFACE
         bool "System interface selection"
-        default BLUERETRO_SYSTEM_PARALLEL
+        default BLUERETRO_SYSTEM_NONE
         help
             Select system interface.
 
-        config BLUERETRO_SYSTEM_PARALLEL
-            bool "Enable Parallel interface"
+        config BLUERETRO_SYSTEM_NONE
+            bool "No system interface configured"
             help
-                Select this to support Parallel open drain interface.
+                Select this to configure no system interface.
 
         config BLUERETRO_SYSTEM_WAVEPAK_VX
             bool "Enable WavePak Vectrex interface"

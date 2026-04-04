@@ -12,9 +12,7 @@
 #include "xbox_usb.h"
 
 void interface_init(void) {
-#if defined(CONFIG_BLUERETRO_SYSTEM_PARALLEL)
-    parallel_init();
-#elif defined(CONFIG_BLUERETRO_SYSTEM_WAVEPAK_VX)
+#if defined(CONFIG_BLUERETRO_SYSTEM_WAVEPAK_VX)
     wavepak_vx_init();
 #elif defined(CONFIG_BLUERETRO_SYSTEM_XBOX)
     xbox_init();
@@ -22,9 +20,7 @@ void interface_init(void) {
 }
 
 const char *interface_get_sys_name(void) {
-#if defined(CONFIG_BLUERETRO_SYSTEM_PARALLEL)
-    return "PARALLEL";
-#elif defined(CONFIG_BLUERETRO_SYSTEM_WAVEPAK_VX)
+#if defined(CONFIG_BLUERETRO_SYSTEM_WAVEPAK_VX)
     return "VECTREX";
 #elif defined(CONFIG_BLUERETRO_SYSTEM_XBOX)
     return "XBOX";
