@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include "adapter/adapter.h"
-#include "interface.h"
+#include "interface_common.h"
 #include "parallel.h"
 #include "wavepak_vx.h"
 #include "xbox_usb.h"

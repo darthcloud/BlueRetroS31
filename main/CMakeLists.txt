@@ -70,19 +70,24 @@ endif()
 
 set(srcs
     "system/fs.c"
-    "wired/wired_common.c"
-    "wired/wired_rtos.c"
-    "wired/parallel.c"
+    "interface/interface_common.c"
 )
 
-if(CONFIG_IDF_TARGET_ESP32)
+if(CONFIG_BLUERETRO_SYSTEM_PARALLEL)
     list(APPEND srcs
+        "interface/parallel.c"
+    )
+endif()
+
+if(CONFIG_BLUERETRO_SYSTEM_WAVEPAK_VX)
+    list(APPEND srcs
+        "interface/wavepak_vx.c"
     )
 endif()
 
 if(CONFIG_BLUERETRO_SYSTEM_XBOX)
     list(APPEND srcs
-        "wired/xbox_usb.c"
+        "interface/xbox_usb.c"
     )
 endif()
 

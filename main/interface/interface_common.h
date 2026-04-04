@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#ifndef _INTERFACE_H_
-#define _INTERFACE_H_
+#ifndef _INTERFACE_COMMON_H_
+#define _INTERFACE_COMMON_H_
 
 void interface_init(void);
 const char *interface_get_sys_name(void);
 
-#endif /* _INTERFACE_H_ */
+#endif /* _INTERFACE_COMMON_H_ */
