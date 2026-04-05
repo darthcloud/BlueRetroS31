@@ -56,7 +56,7 @@ set(srcs
 
 if(CONFIG_BLUERETRO_SYSTEM_WAVEPAK_VX)
     list(APPEND srcs
-        "adapter/wired/wavepak_vc.c"
+        "adapter/wired/wavepak_vx.c"
         "interface/wavepak_vx.c"
     )
 endif()
