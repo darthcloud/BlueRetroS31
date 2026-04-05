@@ -10,12 +10,10 @@
 #include <esp_heap_caps.h>
 #include <esp_timer.h>
 #include "sdkconfig.h"
-#include "queue_bss.h"
 #include "zephyr/types.h"
 #include "tools/util.h"
 #include "config.h"
 #include "adapter.h"
-#include "adapter_debug.h"
 #include "wired/wired.h"
 #include "wireless/wireless.h"
 #include "macro.h"
@@ -226,7 +224,7 @@ static void adapter_fb_stop_cb(void* arg) {
     in_menu = 0;
 
     /* Send 0 byte data, system that require callback stop shall look for that */
-    queue_bss_enqueue(wired_adapter.input_q_hdl, (uint8_t *)&fb_data, sizeof(fb_data));
+    //queue_bss_enqueue(wired_adapter.input_q_hdl, (uint8_t *)&fb_data, sizeof(fb_data));
 }
 
 uint32_t adapter_get_out_mask(uint8_t dev_id) {
@@ -498,10 +496,12 @@ bool adapter_bridge_fb(struct raw_fb *fb_data, struct bt_data *bt_data) {
 }
 
 void IRAM_ATTR adapter_q_fb(struct raw_fb *fb_data) {
+#if 0
     /* Best efford only on fb */
     if (!in_menu) {
         queue_bss_enqueue(wired_adapter.input_q_hdl, (uint8_t *)fb_data, sizeof(*fb_data));
     }
+#endif
 }
 
 void adapter_toggle_fb(uint32_t wired_id, uint32_t duration_us, uint8_t lf_pwr, uint8_t hf_pwr) {
@@ -545,7 +545,7 @@ void adapter_init(void) {
         }
     }
 
-    wired_adapter.input_q_hdl = queue_bss_init(16, sizeof(struct raw_fb));
+    //wired_adapter.input_q_hdl = queue_bss_init(16, sizeof(struct raw_fb));
     if (wired_adapter.input_q_hdl == NULL) {
         printf("# %s: Failed to create fb queue\n", __FUNCTION__);
     }

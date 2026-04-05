@@ -217,6 +217,7 @@ static void bt_fb_task(void *param) {
     struct raw_fb *fb_data = NULL;
     uint32_t delay_cnt = BT_FB_TASK_DELAY_CNT; /* 100ms * 30 = 3sec */
 
+#if 0
     while(1) {
         bool fb_changed = false;
         /* Look for rumble/led feedback data */
@@ -281,6 +282,7 @@ static void bt_fb_task(void *param) {
         }
         vTaskDelay(10 / portTICK_PERIOD_MS);
     }
+#endif
 }
 
 static void bt_host_task(void *param) {

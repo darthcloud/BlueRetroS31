@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <esp_timer.h>
-#include "queue_bss.h"
 #include "zephyr/types.h"
 #include "tools/util.h"
 #include "kb_monitor.h"
@@ -14,7 +13,7 @@
 struct kb_monitor {
     uint32_t dev_id;
     kbmon_id_to_code_t callback;
-    queue_bss_handle_t scq_hdl;
+    //queue_bss_handle_t scq_hdl;
     uint32_t keys_state[4];
     uint32_t tm_delay;
     uint32_t tm_rate;
@@ -43,10 +42,10 @@ void kbmon_init(uint32_t dev_id, kbmon_id_to_code_t callback) {
         kb_monitors[dev_id].tm_state = 0;
         kb_monitors[dev_id].dev_id = dev_id;
         kb_monitors[dev_id].callback = callback;
-        kb_monitors[dev_id].scq_hdl = queue_bss_init(32, 16);
-        if (kb_monitors[dev_id].scq_hdl == NULL) {
-            printf("# Failed to create KBMON:%ld ring buffer\n", dev_id);
-        }
+        //kb_monitors[dev_id].scq_hdl = queue_bss_init(32, 16);
+        //if (kb_monitors[dev_id].scq_hdl == NULL) {
+        //    printf("# Failed to create KBMON:%ld ring buffer\n", dev_id);
+        //}
     }
 }
 
@@ -79,8 +78,9 @@ void kbmon_update(uint32_t dev_id, struct wired_ctrl *ctrl_data) {
 }
 
 int32_t kbmon_set_code(uint32_t dev_id, uint8_t *code, uint32_t len) {
-    struct kb_monitor *kbmon = &kb_monitors[dev_id];
     int32_t ret = -1;
+#if 0
+    struct kb_monitor *kbmon = &kb_monitors[dev_id];
 
     if (kbmon->scq_hdl) {
         ret = queue_bss_enqueue(kbmon->scq_hdl, code, len);
@@ -88,12 +88,14 @@ int32_t kbmon_set_code(uint32_t dev_id, uint8_t *code, uint32_t len) {
             printf("# %s KBMON:%ld scq full!\n", __FUNCTION__, dev_id);
         }
     }
+#endif
     return ret;
 }
 
 int32_t IRAM_ATTR kbmon_get_code(uint32_t dev_id, uint8_t *code, uint32_t *len) {
-    struct kb_monitor *kbmon = &kb_monitors[dev_id];
     int32_t ret = -1;
+#if 0
+    struct kb_monitor *kbmon = &kb_monitors[dev_id];
     uint32_t *qlen;
     if (kbmon->scq_hdl) {
         uint8_t *qcode = queue_bss_dequeue(kbmon->scq_hdl, &qlen);
@@ -104,6 +106,7 @@ int32_t IRAM_ATTR kbmon_get_code(uint32_t dev_id, uint8_t *code, uint32_t *len) 
             ret = 0;
         }
     }
+#endif
     return ret;
 }
 

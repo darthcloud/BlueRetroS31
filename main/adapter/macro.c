@@ -5,7 +5,6 @@
 
 #include "zephyr/types.h"
 #include "tools/util.h"
-#include "system/manager.h"
 #include "config.h"
 #include "macro.h"
 #include "adapter.h"
@@ -33,7 +32,7 @@ static void update_mapping(uint32_t index) {
     if (mapping) {
         mapping->dst_btn = map_dst;
         printf("# %s: idx: %ld Change mapping src: %ld dst: %ld\n", __FUNCTION__, idx, map_src, map_dst);
-        sys_mgr_cmd(SYS_MGR_CMD_SAVE_CONFIG);
+        //sys_mgr_cmd(SYS_MGR_CMD_SAVE_CONFIG);
     }
 }
 
@@ -44,19 +43,19 @@ static void update_turbo(uint32_t index, int32_t btn_id) {
         switch (mapping->turbo) {
             case 0: /* Disable */
                 mapping->turbo = 8;
-                sys_mgr_cmd(SYS_MGR_CMD_FLASH_LED_SLOW);
+                //sys_mgr_cmd(SYS_MGR_CMD_FLASH_LED_SLOW);
                 break;
             case 8: /* 4/8 frames */
                 mapping->turbo = 4;
-                sys_mgr_cmd(SYS_MGR_CMD_FLASH_LED_FAST);
+                //sys_mgr_cmd(SYS_MGR_CMD_FLASH_LED_FAST);
                 break;
             case 4: /* 2/4 frames */
                 mapping->turbo = 2;
-                sys_mgr_cmd(SYS_MGR_CMD_FLASH_LED_FASTER);
+                //sys_mgr_cmd(SYS_MGR_CMD_FLASH_LED_FASTER);
                 break;
             default:
                 mapping->turbo = 0;
-                sys_mgr_cmd(SYS_MGR_CMD_FLASH_LED_ON);
+                //sys_mgr_cmd(SYS_MGR_CMD_FLASH_LED_ON);
                 break;
         }
         printf("# %s: idx: %ld Set turbo on btn: %ld val: %d\n", __FUNCTION__, idx, btn_id, mapping->turbo);
@@ -67,7 +66,7 @@ static void reset_active_mapping(uint32_t index) {
     uint32_t idx = index + config.global_cfg.banksel;
     config_init_mapping_bank(&config, idx);
     printf("# %s: idx: %ld Reset mapping config %d to default\n", __FUNCTION__, idx, config.global_cfg.banksel);
-    sys_mgr_cmd(SYS_MGR_CMD_SAVE_CONFIG);
+    //sys_mgr_cmd(SYS_MGR_CMD_SAVE_CONFIG);
 }
 
 static void update_cfg_acc(uint32_t index) {
@@ -79,7 +78,7 @@ static void update_cfg_acc(uint32_t index) {
         config.out_cfg[index].acc_mode = ACC_NONE;
         printf("# %s: Clear rumble feedback\n", __FUNCTION__);
     }
-    sys_mgr_cmd(SYS_MGR_CMD_SAVE_CONFIG);
+    //sys_mgr_cmd(SYS_MGR_CMD_SAVE_CONFIG);
 }
 
 static void update_calib(uint32_t index) {
@@ -109,7 +108,7 @@ int32_t sys_macro_hdl(struct wired_ctrl *ctrl_data, atomic_t *flags) {
         if (menu_state == MENU_STATE_INACTIVE) {
             printf("# %s: Exiting adapter menu\n", __FUNCTION__);
             adapter_toggle_fb(ctrl_data->index, 300000, 0xFF, 0xFF);
-            sys_mgr_cmd(SYS_MGR_CMD_FLASH_LED_OFF);
+            //sys_mgr_cmd(SYS_MGR_CMD_FLASH_LED_OFF);
         }
         else {
             adapter_toggle_fb(ctrl_data->index, 150000, 0xFF, 0xFF);
@@ -121,11 +120,11 @@ int32_t sys_macro_hdl(struct wired_ctrl *ctrl_data, atomic_t *flags) {
         if (menu_state == MENU_STATE_INACTIVE) {
             menu_state = MENU_STATE_WAIT_OPTIONS;
             printf("# %s: Entering adapter menu\n", __FUNCTION__);
-            sys_mgr_cmd(SYS_MGR_CMD_FLASH_LED_ON);
+            //sys_mgr_cmd(SYS_MGR_CMD_FLASH_LED_ON);
         }
         else {
             if (menu_state == MENU_STATE_WAIT_TURBO) {
-                sys_mgr_cmd(SYS_MGR_CMD_SAVE_CONFIG);
+                //sys_mgr_cmd(SYS_MGR_CMD_SAVE_CONFIG);
             }
             menu_state = MENU_STATE_INACTIVE;
         }
@@ -146,25 +145,25 @@ int32_t sys_macro_hdl(struct wired_ctrl *ctrl_data, atomic_t *flags) {
                     config.global_cfg.banksel = 0;
                     menu_state = MENU_STATE_INACTIVE;
                     printf("# %s: Set mapping bank to %d\n", __FUNCTION__, config.global_cfg.banksel);
-                    sys_mgr_cmd(SYS_MGR_CMD_SAVE_CONFIG);
+                    //sys_mgr_cmd(SYS_MGR_CMD_SAVE_CONFIG);
                     break;
                 case PAD_LD_LEFT:
                     config.global_cfg.banksel = 1;
                     menu_state = MENU_STATE_INACTIVE;
                     printf("# %s: Set mapping bank to %d\n", __FUNCTION__, config.global_cfg.banksel);
-                    sys_mgr_cmd(SYS_MGR_CMD_SAVE_CONFIG);
+                    //sys_mgr_cmd(SYS_MGR_CMD_SAVE_CONFIG);
                     break;
                 case PAD_LD_RIGHT:
                     config.global_cfg.banksel = 2;
                     menu_state = MENU_STATE_INACTIVE;
                     printf("# %s: Set mapping bank to %d\n", __FUNCTION__, config.global_cfg.banksel);
-                    sys_mgr_cmd(SYS_MGR_CMD_SAVE_CONFIG);
+                    //sys_mgr_cmd(SYS_MGR_CMD_SAVE_CONFIG);
                     break;
                 case PAD_LD_DOWN:
                     config.global_cfg.banksel = 3;
                     menu_state = MENU_STATE_INACTIVE;
                     printf("# %s: Set mapping bank to %d\n", __FUNCTION__, config.global_cfg.banksel);
-                    sys_mgr_cmd(SYS_MGR_CMD_SAVE_CONFIG);
+                    //sys_mgr_cmd(SYS_MGR_CMD_SAVE_CONFIG);
                     break;
                 case PAD_MM:
                     menu_state = MENU_STATE_WAIT_MAP_SRC;
@@ -183,13 +182,13 @@ int32_t sys_macro_hdl(struct wired_ctrl *ctrl_data, atomic_t *flags) {
                     menu_state = MENU_STATE_INACTIVE;
                     break;
                 case PAD_RB_RIGHT:
-                    sys_mgr_cmd(SYS_MGR_CMD_INQ_TOOGLE);
+                    //sys_mgr_cmd(SYS_MGR_CMD_INQ_TOOGLE);
                     menu_state = MENU_STATE_INACTIVE;
                     break;
                 case PAD_RB_DOWN:
-                    sys_mgr_cmd(SYS_MGR_CMD_PWR_OFF);
+                    //sys_mgr_cmd(SYS_MGR_CMD_PWR_OFF);
                     menu_state = MENU_STATE_INACTIVE;
-                    sys_mgr_cmd(SYS_MGR_CMD_FLASH_LED_OFF);
+                    //sys_mgr_cmd(SYS_MGR_CMD_FLASH_LED_OFF);
                     adapter_menu_reset();
                     atomic_clear_bit(flags, BT_WAITING_FOR_RELEASE_MACRO1);
                     return 0;
