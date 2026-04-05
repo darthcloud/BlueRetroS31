@@ -17,7 +17,6 @@
 #include "adapter/config.h"
 #include "adapter/memory_card.h"
 #include "adapter/gameid.h"
-#include "system/manager.h"
 #include "system/fs.h"
 
 #define ATT_MAX_LEN 512
@@ -527,7 +526,7 @@ static void bt_att_cfg_cmd_wr_hdlr(struct bt_dev *device, uint8_t *data, uint32_
             if (esp_ota_end(ota_hdl) == 0) {
                 if (esp_ota_set_boot_partition(update_partition) == 0) {
                     ota_hdl = 0;
-                    sys_mgr_cmd(SYS_MGR_CMD_ADAPTER_RST);
+                    //sys_mgr_cmd(SYS_MGR_CMD_ADAPTER_RST);
                     printf("# OTA FW Update sucessfull! Restarting...\n");
                 }
                 else {
@@ -540,17 +539,17 @@ static void bt_att_cfg_cmd_wr_hdlr(struct bt_dev *device, uint8_t *data, uint32_
             break;
         case CFG_CMD_SYS_DEEP_SLEEP:
             printf("# ESP32 going in deep sleep\n");
-            sys_mgr_cmd(SYS_MGR_CMD_DEEP_SLEEP);
+            //sys_mgr_cmd(SYS_MGR_CMD_DEEP_SLEEP);
             break;
         case CFG_CMD_SYS_RESET:
         {
             printf("# Reset ESP32\n");
-            sys_mgr_cmd(SYS_MGR_CMD_ADAPTER_RST);
+            //sys_mgr_cmd(SYS_MGR_CMD_ADAPTER_RST);
             break;
         }
         case CFG_CMD_SYS_FACTORY:
         {
-            sys_mgr_cmd(SYS_MGR_CMD_FACTORY_RST);
+            //sys_mgr_cmd(SYS_MGR_CMD_FACTORY_RST);
             break;
         }
         case CFG_CMD_OTA_ABORT:

@@ -7,7 +7,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <freertos/FreeRTOS.h>
-#include <xtensa/hal.h>
 #include <esp_heap_caps.h>
 #include <esp_timer.h>
 #include "sdkconfig.h"

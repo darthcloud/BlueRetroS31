@@ -15,9 +15,8 @@
 #include "att_hid.h"
 #include "smp.h"
 #include "tools/util.h"
-#include "system/led.h"
 #include "adapter/config.h"
-#include "wired/wired_common.h"
+#include "interface/interface_common.h"
 #include "zephyr/uuid.h"
 
 #define BT_INQUIRY_MAX 10
@@ -1239,7 +1238,7 @@ static int32_t bt_hci_get_encrypt_context(struct bt_dev **device, bt_hci_le_cb_t
 
 static void bt_hci_set_device_name(void) {
     strcat(local_name, "_");
-    strncat(local_name, wired_get_sys_name(), 6);
+    strncat(local_name, interface_get_sys_name(), 6);
     strcat(local_name, "_");
     snprintf(local_name + strlen(local_name), 5, "%02X%02X", local_bdaddr[1], local_bdaddr[0]);
     printf("# local_name: %s\n", local_name);
@@ -1270,7 +1269,7 @@ const char *bt_hci_get_device_name(void) {
 
 void bt_hci_start_inquiry(void) {
     if (!inquiry_override) {
-        err_led_pulse();
+        //err_led_pulse();
         inquiry_state = 1;
         bt_nb_inquiry = 0;
         bt_hci_cmd_le_set_scan_enable(0);
@@ -1286,7 +1285,7 @@ void bt_hci_stop_inquiry(void) {
     bt_hci_cmd_le_set_scan_param_passive();
     bt_hci_cmd_le_set_scan_enable(1);
     inquiry_state = 0;
-    err_led_clear();
+    //err_led_clear();
 }
 
 uint32_t bt_hci_get_inquiry(void) {

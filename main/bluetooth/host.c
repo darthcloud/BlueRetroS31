@@ -13,7 +13,6 @@
 #include <esp_timer.h>
 #include <driver/gpio.h>
 #include "nvs.h"
-#include "queue_bss.h"
 #include "host.h"
 #include "hci.h"
 #include "l2cap.h"
@@ -22,14 +21,12 @@
 #include "att_hid.h"
 #include "smp.h"
 #include "tools/util.h"
-#include "debug.h"
 #include "mon.h"
 #include "system/fs.h"
 #include "adapter/config.h"
 #include "adapter/gameid.h"
 #include "adapter/memory_card.h"
 #include "adapter/wired/wired.h"
-#include "wired/xbox_usb.h"
 #include "adapter/hid_parser.h"
 #include "bluetooth/hidp/ps.h"
 
