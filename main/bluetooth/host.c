@@ -309,7 +309,7 @@ static void bt_host_task(void *param) {
         }
 
         /* Update turbo mask for parallel system */
-        wired_para_turbo_mask_hdlr();
+        //wired_para_turbo_mask_hdlr();
 #ifdef CONFIG_BLUERETRO_SYSTEM_XBOX
         xbox_send_report();
 #endif
