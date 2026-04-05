@@ -10,25 +10,6 @@ set(cov_srcs
     "adapter/macro.c"
     "adapter/mapping_quirks.c"
     "adapter/memory_card.c"
-    "adapter/wired/npiso.c"
-    "adapter/wired/cdi.c"
-    "adapter/wired/saturn.c"
-    "adapter/wired/pce.c"
-    "adapter/wired/genesis.c"
-    "adapter/wired/real.c"
-    "adapter/wired/jag.c"
-    "adapter/wired/pcfx.c"
-    "adapter/wired/jvs.c"
-    "adapter/wired/n64.c"
-    "adapter/wired/dc.c"
-    "adapter/wired/gc.c"
-    "adapter/wired/ps.c"
-    "adapter/wired/sea.c"
-    "adapter/wired/wii.c"
-    "adapter/wired/xbox.c"
-    "adapter/wired/gp01.c"
-    "adapter/wired/parallel_1p.c"
-    "adapter/wired/parallel_2p.c"
     "adapter/wired/wired.c"
     "adapter/wireless/hid_generic.c"
     "adapter/wireless/ps3.c"
@@ -73,20 +54,16 @@ set(srcs
     "interface/interface_common.c"
 )
 
-if(CONFIG_BLUERETRO_SYSTEM_PARALLEL)
-    list(APPEND srcs
-        "interface/parallel.c"
-    )
-endif()
-
 if(CONFIG_BLUERETRO_SYSTEM_WAVEPAK_VX)
     list(APPEND srcs
+        "adapter/wired/wavepak_vc.c"
         "interface/wavepak_vx.c"
     )
 endif()
 
 if(CONFIG_BLUERETRO_SYSTEM_XBOX)
     list(APPEND srcs
+        "adapter/wired/xbox.c"
         "interface/xbox_usb.c"
     )
 endif()
