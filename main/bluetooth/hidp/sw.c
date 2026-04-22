@@ -92,11 +92,11 @@ void bt_hid_cmd_sw_set_conf(struct bt_dev *device, void *report) {
     sw_conf->tid &= 0xF;
 
 
-    /* 8bitdo wont rumble w/ set_conf... */
-    if (((uint8_t *)report)[127] == FB_TYPE_RUMBLE) {
-        protocol = BT_HIDP_SW_SET_RUMBLE;
-        len = sizeof(struct bt_hidp_sw_rumble);
-    }
+    /* FIXME 8bitdo wont rumble w/ set_conf... */
+    //if (((uint8_t *)report)[127] == FB_TYPE_RUMBLE) {
+    //    protocol = BT_HIDP_SW_SET_RUMBLE;
+    //    len = sizeof(struct bt_hidp_sw_rumble);
+    //}
 
     bt_hid_cmd(device->acl_handle, device->intr_chan.dcid, BT_HIDP_DATA_OUT, protocol, len);
 }
