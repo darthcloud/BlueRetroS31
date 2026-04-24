@@ -47,7 +47,7 @@ void wired_from_generic(int32_t dev_mode, struct wired_ctrl *ctrl_data, struct w
 
 void wired_fb_to_generic(int32_t dev_mode, struct raw_fb *raw_fb_data, struct generic_fb *fb_data) {
 #if defined(CONFIG_BLUERETRO_SYSTEM_XBOX)
-    xbox_fb_from_generic(dev_mode, raw_fb_data, fb_data);
+    xbox_fb_to_generic(dev_mode, raw_fb_data, fb_data);
 #endif
 }
 

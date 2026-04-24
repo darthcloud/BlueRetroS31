@@ -311,7 +311,7 @@ static void bt_host_task(void *param) {
         /* Update turbo mask for parallel system */
         //wired_para_turbo_mask_hdlr();
 #ifdef CONFIG_BLUERETRO_SYSTEM_XBOX
-        xbox_send_report();
+        //xbox_send_report();
 #endif
 
 #ifdef CONFIG_BLUERETRO_ADAPTER_RUMBLE_DBG
@@ -321,7 +321,7 @@ static void bt_host_task(void *param) {
 
         /* Queue rumble request for xbox, some games need it */
 #ifdef CONFIG_BLUERETRO_SYSTEM_XBOX
-        xbox_get_report();
+        //xbox_get_report();
 #endif
 
         vTaskDelay(20 / portTICK_PERIOD_MS);

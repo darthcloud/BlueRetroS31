@@ -4,10 +4,10 @@
  */
 
 #include "xbox_usb.h"
-#if 0
+#ifdef CONFIG_BLUERETRO_SYSTEM_XBOX
 #include <stdio.h>
 #include "esp_mac.h"
-#include "tinyusb.h"
+#include "tinyusb_default_config.h"
 #include "device/usbd_pvt.h"
 #include "adapter/adapter.h"
 #include "adapter/wired/xbox.h"
@@ -199,14 +199,19 @@ bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_requ
 
 void xbox_init(void)
 {
-#if 0
+#ifdef CONFIG_BLUERETRO_SYSTEM_XBOX
     const tinyusb_config_t tusb_cfg = {
-        .device_descriptor = &device_desc,
-        .string_descriptor = hid_string_desc,
-        .string_descriptor_count = sizeof(hid_string_desc) / sizeof(hid_string_desc[0]),
-        .external_phy = false,
-        .configuration_descriptor = xbox_config_desc,
-        .self_powered = false,
+        .port = TINYUSB_PORT_DEFAULT_HS,
+        .phy.skip_setup = false,
+        .phy.self_powered = false,
+        .phy.vbus_monitor_io = -1,
+        .task = TINYUSB_TASK_DEFAULT(),
+        .descriptor.device = &device_desc,
+        .descriptor.qualifier = NULL,
+        .descriptor.string = hid_string_desc,
+        .descriptor.string_count = sizeof(hid_string_desc) / sizeof(hid_string_desc[0]),
+        .descriptor.full_speed_config = xbox_config_desc,
+        .descriptor.high_speed_config = NULL,
     };
 
     uint8_t mac[6];
@@ -221,7 +226,7 @@ void xbox_init(void)
 }
 
 void xbox_send_report(void) {
-#if 0
+#ifdef CONFIG_BLUERETRO_SYSTEM_XBOX
     if (tud_ready() && !usbd_edpt_busy(0, ep_in)) {
         /* Buttons */
         ep_in_buf[2] = wired_adapter.data[0].output[2]
@@ -242,7 +247,7 @@ void xbox_send_report(void) {
 }
 
 void xbox_get_report(void) {
-#if 0
+#ifdef CONFIG_BLUERETRO_SYSTEM_XBOX
     if (tud_ready() && !usbd_edpt_busy(0, ep_out)) {
         usbd_edpt_xfer(0, ep_out, ep_out_buf, XBOX_REPORT_OUT_SIZE);
     }
@@ -250,5 +255,6 @@ void xbox_get_report(void) {
 }
 
 void xbox_port_cfg(uint16_t mask) {
-
+#ifdef CONFIG_BLUERETRO_SYSTEM_XBOX
+#endif
 }

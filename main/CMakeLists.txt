@@ -101,6 +101,7 @@ set(components
     "esp_timer"
     "nvs_flash"
     "spiffs"
+    "esp_tinyusb"
 )
 
 idf_component_register(

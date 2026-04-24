@@ -3,5 +3,5 @@
 cmake_minimum_required(VERSION 3.5)
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
-set(EXCLUDE_COMPONENTS esp_encrypted_img  esp_tinyusb tinyusb)
+set(EXCLUDE_COMPONENTS esp_encrypted_img)
 project("BlueRetro$ENV{BR_HW}$ENV{BR_SYS}")

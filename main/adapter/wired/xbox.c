@@ -164,7 +164,7 @@ static void xbox_ctrl_from_generic(struct wired_ctrl *ctrl_data, struct wired_da
     }
 
 #ifdef CONFIG_BLUERETRO_SYSTEM_XBOX
-    xbox_send_report();
+    //xbox_send_report();
 #endif
 
 #ifdef CONFIG_BLUERETRO_RAW_OUTPUT
