@@ -152,15 +152,15 @@ static bool xboxd_xfer_cb(uint8_t rhport, uint8_t ep_addr, xfer_result_t result,
 
 static usbd_class_driver_t const xbox_driver =
 {
-#if CFG_TUSB_DEBUG >= 2
     .name = "XBOX",
-#endif
-    .init             = xboxd_init,
-    .reset            = xboxd_reset,
-    .open             = xboxd_open,
-    .control_xfer_cb  = xboxd_control_xfer_cb,
-    .xfer_cb          = xboxd_xfer_cb,
-    .sof              = NULL
+    .init = xboxd_init,
+    .deinit = NULL,
+    .reset = xboxd_reset,
+    .open = xboxd_open,
+    .control_xfer_cb = xboxd_control_xfer_cb,
+    .xfer_cb = xboxd_xfer_cb,
+    .xfer_isr = NULL,
+    .sof = NULL,
 };
 
 usbd_class_driver_t const *usbd_app_driver_get_cb(uint8_t *driver_count) {
@@ -201,7 +201,7 @@ void xbox_init(void)
 {
 #ifdef CONFIG_BLUERETRO_SYSTEM_XBOX
     const tinyusb_config_t tusb_cfg = {
-        .port = TINYUSB_PORT_DEFAULT_HS,
+        .port = 0,
         .phy.skip_setup = false,
         .phy.self_powered = false,
         .phy.vbus_monitor_io = -1,
