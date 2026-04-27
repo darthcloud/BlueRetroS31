@@ -1,17 +1,19 @@
 /*
- * Copyright (c) 2024, Jacques Gagnon
+ * Copyright (c) 2024-2026, Jacques Gagnon
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include "xbox_usb.h"
-#ifdef CONFIG_BLUERETRO_SYSTEM_XBOX
 #include <stdio.h>
+#include "interface_common.h"
+#include "xbox_usb.h"
 #include "esp_mac.h"
+#include "esp_timer.h"
 #include "tinyusb_default_config.h"
 #include "device/usbd_pvt.h"
 #include "adapter/adapter.h"
-#include "adapter/wired/xbox.h"
 #include "adapter/config.h"
+
+#define XBOX_TIMER_PERIOD_US 200000
 
 #define XBOX_INTERFACE_CLASS 88
 #define XBOX_INTERFACE_SUBCLASS 66
@@ -23,9 +25,10 @@
 
 static uint8_t ep_out = 0;
 static uint8_t ep_in = 0;
-static uint8_t ep_out_buf[XBOX_REPORT_MAX_SIZE];
-static uint8_t ep_in_buf[XBOX_REPORT_MAX_SIZE] = {0};
+static __attribute__ ((aligned (64))) uint8_t ep_out_buf[XBOX_REPORT_MAX_SIZE];
+static __attribute__ ((aligned (64))) uint8_t ep_in_buf[XBOX_REPORT_MAX_SIZE] = {0, 20, 0xFF};
 
+static esp_timer_handle_t xbox_timer = NULL;
 static char serial[13] = {0};
 
 static const tusb_desc_device_t device_desc = {
@@ -73,13 +76,28 @@ static const uint8_t xbox_vendor_in_desc[] = {
     0xff, 0xff, 0xff, 0xff,
 };
 
+static void xbox_timer_callback(void *arg) {
+    BR_IFACE_DBG_LOG("%s\n", __FUNCTION__);
+    xbox_send_report();
+}
+
 static void xboxd_init(void) {
+    BR_IFACE_DBG_LOG("%s\n", __FUNCTION__);
+    const esp_timer_create_args_t timer_args = {
+        .callback = &xbox_timer_callback,
+        .arg = NULL,
+        .name = "xbox_timer"
+    };
+    esp_timer_create(&timer_args, &xbox_timer);
 }
 
 static void xboxd_reset(uint8_t rhport) {
+    BR_IFACE_DBG_LOG("%s\n", __FUNCTION__);
+    esp_timer_stop(xbox_timer);
 }
 
 static uint16_t xboxd_open(uint8_t rhport, tusb_desc_interface_t const *desc_itf, uint16_t max_len) {
+    BR_IFACE_DBG_LOG("%s\n", __FUNCTION__);
     TU_VERIFY(
         XBOX_INTERFACE_CLASS == desc_itf->bInterfaceClass &&
         XBOX_INTERFACE_SUBCLASS == desc_itf->bInterfaceSubClass &&
@@ -95,46 +113,65 @@ static uint16_t xboxd_open(uint8_t rhport, tusb_desc_interface_t const *desc_itf
     p_desc = tu_desc_next(p_desc);
     TU_ASSERT(usbd_open_edpt_pair(rhport, p_desc, desc_itf->bNumEndpoints, TUSB_XFER_INTERRUPT, &ep_out, &ep_in), 0);
 
+    BR_IFACE_DBG_LOG("%s: ep_out: %d ep_in: %d\n", __FUNCTION__, ep_out, ep_in);
+    esp_timer_start_periodic(xbox_timer, XBOX_TIMER_PERIOD_US);
+
     return drv_len;
 }
 
 static bool xboxd_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t const * request) {
-    if (stage == CONTROL_STAGE_SETUP) {
-        switch (request->bmRequestType) {
-            case 0x21:
-                tud_control_xfer(rhport, request, ep_out_buf, request->wLength);
-                break;
-            case 0xa1:
-            default:
-                tud_control_xfer(rhport, request, wired_adapter.data[0].output, request->wLength);
-                break;
-        }
-    }
-    else if (stage == CONTROL_STAGE_ACK) {
-        switch (request->bmRequestType) {
-            case 0x21:
-            {
-                // printf("%s: Got rumble fb: %02X%02X%02X%02X\n", __FUNCTION__,
-                //     ep_out_buf[2], ep_out_buf[3], ep_out_buf[4], ep_out_buf[5]);
-                if (config.out_cfg[0].acc_mode == ACC_RUMBLE) {
-                    struct raw_fb fb_data = {0};
-                    fb_data.data[0] = ep_out_buf[3];
-                    fb_data.data[1] = ep_out_buf[5];
-                    fb_data.header.wired_id = 0;
-                    fb_data.header.type = FB_TYPE_RUMBLE;
-                    fb_data.header.data_len = 2;
-                    adapter_q_fb(&fb_data);
-                }
-                break;
+    BR_IFACE_DBG_LOG("%s: ", __FUNCTION__);
+    switch (stage) {
+        case CONTROL_STAGE_IDLE:
+            BR_IFACE_DBG_LOG("IDLE\n");
+            break;
+        case CONTROL_STAGE_SETUP:
+        {
+            BR_IFACE_DBG_LOG("SETUP\n");
+            switch (request->bmRequestType) {
+                case 0x21:
+                    tud_control_xfer(rhport, request, ep_out_buf, request->wLength);
+                    break;
+                case 0xa1:
+                default:
+                    tud_control_xfer(rhport, request, wired_adapter.data[0].output, request->wLength);
+                    break;
             }
+            break;
+        }
+        case CONTROL_STAGE_DATA:
+            BR_IFACE_DBG_LOG("DATA\n");
+            break;
+        case CONTROL_STAGE_ACK:
+        {
+            BR_IFACE_DBG_LOG("ACK\n");
+            switch (request->bmRequestType) {
+                case 0x21:
+                {
+                    // BR_IFACE_DBG_LOG("%s: Got rumble fb: %02X%02X%02X%02X\n", __FUNCTION__,
+                    //     ep_out_buf[2], ep_out_buf[3], ep_out_buf[4], ep_out_buf[5]);
+                    if (config.out_cfg[0].acc_mode == ACC_RUMBLE) {
+                        struct raw_fb fb_data = {0};
+                        fb_data.data[0] = ep_out_buf[3];
+                        fb_data.data[1] = ep_out_buf[5];
+                        fb_data.header.wired_id = 0;
+                        fb_data.header.type = FB_TYPE_RUMBLE;
+                        fb_data.header.data_len = 2;
+                        adapter_q_fb(&fb_data);
+                    }
+                    break;
+                }
+            }
+            break;
         }
     }
     return true;
 }
 
 static bool xboxd_xfer_cb(uint8_t rhport, uint8_t ep_addr, xfer_result_t result, uint32_t xferred_bytes) {
+    BR_IFACE_DBG_LOG("%s ep: %d len: %ld\n", __FUNCTION__, ep_addr, xferred_bytes);
     if (ep_addr == ep_out) {
-        // printf("%s: Got rumble fb: %02X%02X%02X%02X\n", __FUNCTION__,
+        // BR_IFACE_DBG_LOG("%s: Got rumble fb: %02X%02X%02X%02X\n", __FUNCTION__,
         //     ep_out_buf[2], ep_out_buf[3], ep_out_buf[4], ep_out_buf[5]);
         if (config.out_cfg[0].acc_mode == ACC_RUMBLE) {
             struct raw_fb fb_data = {0};
@@ -145,6 +182,10 @@ static bool xboxd_xfer_cb(uint8_t rhport, uint8_t ep_addr, xfer_result_t result,
             fb_data.header.data_len = 2;
             adapter_q_fb(&fb_data);
         }
+    }
+    else if (ep_addr == ep_in) {
+        esp_timer_restart(xbox_timer, XBOX_TIMER_PERIOD_US);
+        xbox_send_report();
     }
 
     return true;
@@ -164,42 +205,53 @@ static usbd_class_driver_t const xbox_driver =
 };
 
 usbd_class_driver_t const *usbd_app_driver_get_cb(uint8_t *driver_count) {
+    BR_IFACE_DBG_LOG("%s\n", __FUNCTION__);
     *driver_count = 1;
     return &xbox_driver;
 }
 
 bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t const * request) {
-    if (stage == CONTROL_STAGE_SETUP) {
-        switch (request->bmRequestType) {
-            case 0xc1:
-                switch (request->bRequest) {
-                    case 0x01:
-                        if (request->wValue == 0x0100) {
-                            tud_control_xfer(rhport, request, (void *)xbox_vendor_in_desc, request->wLength);
-                        }
-                        else {
-                            tud_control_xfer(rhport, request, (void *)xbox_vendor_out_desc, request->wLength);
-                        }
-                        break;
-                    case 0x06:
-                    default:
-                        tud_control_xfer(rhport, request, (void *)xbox_vendor_desc, request->wLength);
-                        break;
-                }
-                break;
-            case 0x01:
-            default:
-                tud_control_xfer(rhport, request, wired_adapter.data[0].output, request->wLength);
-                break;
-        }
+    BR_IFACE_DBG_LOG("%s: ", __FUNCTION__);
+    switch (stage) {
+        case CONTROL_STAGE_IDLE:
+            BR_IFACE_DBG_LOG("IDLE\n");
+            break;
+        case CONTROL_STAGE_SETUP:
+            switch (request->bmRequestType) {
+                case 0xc1:
+                    switch (request->bRequest) {
+                        case 0x01:
+                            if (request->wValue == 0x0100) {
+                                tud_control_xfer(rhport, request, (void *)xbox_vendor_in_desc, request->wLength);
+                            }
+                            else {
+                                tud_control_xfer(rhport, request, (void *)xbox_vendor_out_desc, request->wLength);
+                            }
+                            break;
+                        case 0x06:
+                        default:
+                            tud_control_xfer(rhport, request, (void *)xbox_vendor_desc, request->wLength);
+                            break;
+                    }
+                    break;
+                case 0x01:
+                default:
+                    tud_control_xfer(rhport, request, wired_adapter.data[0].output, request->wLength);
+                    break;
+            }
+            break;
+        case CONTROL_STAGE_DATA:
+            BR_IFACE_DBG_LOG("DATA\n");
+            break;
+        case CONTROL_STAGE_ACK:
+            BR_IFACE_DBG_LOG("ACK\n");
+            break;
     }
     return true;
 }
-#endif
 
 void xbox_init(void)
 {
-#ifdef CONFIG_BLUERETRO_SYSTEM_XBOX
     const tinyusb_config_t tusb_cfg = {
         .port = 0,
         .phy.skip_setup = false,
@@ -222,12 +274,12 @@ void xbox_init(void)
     ep_in_buf[1] = XBOX_REPORT_IN_SIZE;
 
     tinyusb_driver_install(&tusb_cfg);
-#endif
 }
 
 void xbox_send_report(void) {
-#ifdef CONFIG_BLUERETRO_SYSTEM_XBOX
+    BR_IFACE_DBG_LOG("%s: tud_ready: %d edpt_busy: %d\n", __FUNCTION__, tud_ready(), usbd_edpt_busy(0, ep_in));
     if (tud_ready() && !usbd_edpt_busy(0, ep_in)) {
+#if 0
         /* Buttons */
         ep_in_buf[2] = wired_adapter.data[0].output[2]
             & wired_adapter.data[0].output_mask[2];
@@ -241,20 +293,17 @@ void xbox_send_report(void) {
             & wired_adapter.data[0].output_mask32[3];
         *(uint32_t *)&ep_in_buf[16] = wired_adapter.data[0].output32[4]
             & wired_adapter.data[0].output_mask32[4];
-        usbd_edpt_xfer(0, ep_in, ep_in_buf, XBOX_REPORT_IN_SIZE);
-    }
 #endif
+        bool sts = usbd_edpt_xfer(0, ep_in, ep_in_buf, XBOX_REPORT_IN_SIZE);
+        BR_IFACE_DBG_LOG("%s: sts: %d\n", __FUNCTION__, sts);
+    }
 }
 
 void xbox_get_report(void) {
-#ifdef CONFIG_BLUERETRO_SYSTEM_XBOX
     if (tud_ready() && !usbd_edpt_busy(0, ep_out)) {
         usbd_edpt_xfer(0, ep_out, ep_out_buf, XBOX_REPORT_OUT_SIZE);
     }
-#endif
 }
 
 void xbox_port_cfg(uint16_t mask) {
-#ifdef CONFIG_BLUERETRO_SYSTEM_XBOX
-#endif
 }

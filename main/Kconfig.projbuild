@@ -15,10 +15,15 @@ menu "BlueRetro"
         help
             Select this to enable Bluetooth H4 tracing.
 
+    config BLUERETRO_INTERFACE_DEBUG_LOG
+        bool "Enable wired interface debug log"
+        help
+            Select this to enable wired interface debug log.
+
     config BLUERETRO_BT_MON_VERBOSE
         bool "Enable verbose loggin into BT monitor"
         help
-            Seclect this to enable verbose loggin into BT monitor.
+            Seclect this to enable verbose logging into BT monitor.
 
     config BLUERETRO_BT_SSP_DBG
         bool "Enable Bluetooth SSP debug mode"
