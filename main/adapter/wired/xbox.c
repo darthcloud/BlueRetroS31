@@ -1,10 +1,9 @@
 /*
- * Copyright (c) 2019-2024, Jacques Gagnon
+ * Copyright (c) 2019-2026, Jacques Gagnon
  * SPDX-License-Identifier: Apache-2.0
  */
 
 #include <string.h>
-#include "zephyr/types.h"
 #include "tools/util.h"
 #include "adapter/config.h"
 #include "adapter/wired/wired.h"
@@ -162,10 +161,6 @@ static void xbox_ctrl_from_generic(struct wired_ctrl *ctrl_data, struct wired_da
         }
         wired_data->cnt_mask[btn_id] = ctrl_data->axes[i].cnt_mask;
     }
-
-#ifdef CONFIG_BLUERETRO_SYSTEM_XBOX
-    //xbox_send_report();
-#endif
 
 #ifdef CONFIG_BLUERETRO_RAW_OUTPUT
     printf("{\"log_type\": \"wired_output\", \"axes\": [%d, %d, %d, %d, %d, %d, %d, %d, %d, %d], \"btns\": %d}\n",

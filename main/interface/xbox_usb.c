@@ -26,7 +26,7 @@
 static uint8_t ep_out = 0;
 static uint8_t ep_in = 0;
 static __attribute__ ((aligned (64))) uint8_t ep_out_buf[XBOX_REPORT_MAX_SIZE];
-static __attribute__ ((aligned (64))) uint8_t ep_in_buf[XBOX_REPORT_MAX_SIZE] = {0, 20, 0xFF};
+static __attribute__ ((aligned (64))) uint8_t ep_in_buf[XBOX_REPORT_MAX_SIZE];
 
 static esp_timer_handle_t xbox_timer = NULL;
 static char serial[13] = {0};
@@ -94,6 +94,9 @@ static void xboxd_init(void) {
 static void xboxd_reset(uint8_t rhport) {
     BR_IFACE_DBG_LOG("%s\n", __FUNCTION__);
     esp_timer_stop(xbox_timer);
+
+    memset(ep_in_buf, 0, XBOX_REPORT_MAX_SIZE);
+    ep_in_buf[1] = XBOX_REPORT_IN_SIZE;
 }
 
 static uint16_t xboxd_open(uint8_t rhport, tusb_desc_interface_t const *desc_itf, uint16_t max_len) {
@@ -271,15 +274,12 @@ void xbox_init(void)
     snprintf(serial, sizeof(serial), "%02X%02X%02X%02X%02X%02X",
         mac[5], mac[4], mac[3], mac[2], mac[1], mac[0]);
 
-    ep_in_buf[1] = XBOX_REPORT_IN_SIZE;
-
     tinyusb_driver_install(&tusb_cfg);
 }
 
 void xbox_send_report(void) {
     BR_IFACE_DBG_LOG("%s: tud_ready: %d edpt_busy: %d\n", __FUNCTION__, tud_ready(), usbd_edpt_busy(0, ep_in));
     if (tud_ready() && !usbd_edpt_busy(0, ep_in)) {
-#if 0
         /* Buttons */
         ep_in_buf[2] = wired_adapter.data[0].output[2]
             & wired_adapter.data[0].output_mask[2];
@@ -293,7 +293,7 @@ void xbox_send_report(void) {
             & wired_adapter.data[0].output_mask32[3];
         *(uint32_t *)&ep_in_buf[16] = wired_adapter.data[0].output32[4]
             & wired_adapter.data[0].output_mask32[4];
-#endif
+
         bool sts = usbd_edpt_xfer(0, ep_in, ep_in_buf, XBOX_REPORT_IN_SIZE);
         BR_IFACE_DBG_LOG("%s: sts: %d\n", __FUNCTION__, sts);
     }

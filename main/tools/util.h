@@ -20,6 +20,8 @@
 #include "mesh_types.h"
 #include "mesh_trace.h"
 #include "soc/soc.h"
+#else
+#include "zephyr/types.h"
 #endif /* BLUERETRO */
 
 #ifdef __cplusplus

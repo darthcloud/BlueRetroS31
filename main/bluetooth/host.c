@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2025, Jacques Gagnon
+ * Copyright (c) 2019-2026, Jacques Gagnon
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -310,18 +310,10 @@ static void bt_host_task(void *param) {
 
         /* Update turbo mask for parallel system */
         //wired_para_turbo_mask_hdlr();
-#ifdef CONFIG_BLUERETRO_SYSTEM_XBOX
-        //xbox_send_report();
-#endif
 
 #ifdef CONFIG_BLUERETRO_ADAPTER_RUMBLE_DBG
     adapter_toggle_fb(0, 150000,
         wired_adapter.data[0].output[16], wired_adapter.data[0].output[17]);
-#endif
-
-        /* Queue rumble request for xbox, some games need it */
-#ifdef CONFIG_BLUERETRO_SYSTEM_XBOX
-        //xbox_get_report();
 #endif
 
         vTaskDelay(20 / portTICK_PERIOD_MS);
