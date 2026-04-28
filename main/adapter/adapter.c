@@ -404,10 +404,8 @@ int8_t btn_sign(uint32_t polarity, uint8_t btn_id) {
 }
 
 void IRAM_ATTR adapter_init_buffer(uint8_t wired_id) {
-    if (wired_adapter.system_id != WIRED_AUTO) {
-        wired_adapter.data[wired_id].index = wired_id;
-        wired_init_buffer(config.out_cfg[wired_id].dev_mode, &wired_adapter.data[wired_id]);
-    }
+    wired_adapter.data[wired_id].index = wired_id;
+    wired_init_buffer(config.out_cfg[wired_id].dev_mode, &wired_adapter.data[wired_id]);
 }
 
 void adapter_bridge(struct bt_data *bt_data) {
@@ -423,41 +421,39 @@ void adapter_bridge(struct bt_data *bt_data) {
         TESTS_CMDS_LOG("\"generic_input\": {");
         adapter_debug_wireless_print(ctrl_input);
 #endif
-        if (wired_adapter.system_id != WIRED_AUTO) {
-            if (wired_meta_init(ctrl_output, in_menu)) {
-                /* Unsupported system */
-                return;
-            }
+        if (wired_meta_init(ctrl_output, in_menu)) {
+            /* Unsupported system */
+            return;
+        }
 
 #ifdef CONFIG_BLUERETRO_SYSTEM_XBOX
-            uint32_t cfg_idx = (in_menu) ? 4 : bt_data->base.pids->out_idx + config.global_cfg.banksel;
+        uint32_t cfg_idx = (in_menu) ? 4 : bt_data->base.pids->out_idx + config.global_cfg.banksel;
 #endif
 
-            adapter_out_mask[bt_data->base.pids->out_idx] =
+        adapter_out_mask[bt_data->base.pids->out_idx] =
 #ifdef CONFIG_BLUERETRO_SYSTEM_XBOX
-                out_mask = adapter_mapping(&config.in_cfg[cfg_idx]);
+            out_mask = adapter_mapping(&config.in_cfg[cfg_idx]);
 #else
-                out_mask = adapter_mapping(&config.in_cfg[bt_data->base.pids->out_idx]);
+            out_mask = adapter_mapping(&config.in_cfg[bt_data->base.pids->out_idx]);
 #endif
 
 #ifdef CONFIG_BLUERETRO_ADAPTER_INPUT_MAP_DBG
-            TESTS_CMDS_LOG("\"mapped_input\": {");
-            adapter_debug_wired_print(&ctrl_output[bt_data->base.pids->out_idx]);
+        TESTS_CMDS_LOG("\"mapped_input\": {");
+        adapter_debug_wired_print(&ctrl_output[bt_data->base.pids->out_idx]);
 #endif
-            ctrl_output[bt_data->base.pids->out_idx].index = bt_data->base.pids->out_idx;
-            int32_t menu_ret = sys_macro_hdl(&ctrl_output[bt_data->base.pids->out_idx], &bt_data->base.flags[PAD]);
-            if (menu_ret) {
-                /* We are in the adapter menu, mute output to system */
-                if (!in_menu) {
-                    in_menu = 1;
-                }
-                return;
+        ctrl_output[bt_data->base.pids->out_idx].index = bt_data->base.pids->out_idx;
+        int32_t menu_ret = sys_macro_hdl(&ctrl_output[bt_data->base.pids->out_idx], &bt_data->base.flags[PAD]);
+        if (menu_ret) {
+            /* We are in the adapter menu, mute output to system */
+            if (!in_menu) {
+                in_menu = 1;
             }
-            for (uint32_t i = 0; out_mask; i++, out_mask >>= 1) {
-                if (out_mask & 0x1) {
-                    ctrl_output[i].index = i;
-                    wired_from_generic(config.out_cfg[i].dev_mode, &ctrl_output[i], &wired_adapter.data[i]);
-                }
+            return;
+        }
+        for (uint32_t i = 0; out_mask; i++, out_mask >>= 1) {
+            if (out_mask & 0x1) {
+                ctrl_output[i].index = i;
+                wired_from_generic(config.out_cfg[i].dev_mode, &ctrl_output[i], &wired_adapter.data[i]);
             }
         }
     }
