@@ -12,7 +12,7 @@ CONFIG_BOOTLOADER_APP_ROLLBACK_ENABLE=y
 #
 # Serial flasher config
 #
-CONFIG_ESPTOOLPY_FLASHSIZE_8MB=y
+CONFIG_ESPTOOLPY_FLASHSIZE_16MB=y
 # end of Serial flasher config
 
 #
