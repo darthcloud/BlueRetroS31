@@ -266,7 +266,7 @@ void xbox_init(void)
         .descriptor.string = hid_string_desc,
         .descriptor.string_count = sizeof(hid_string_desc) / sizeof(hid_string_desc[0]),
         .descriptor.full_speed_config = xbox_config_desc,
-        .descriptor.high_speed_config = NULL,
+        .descriptor.high_speed_config = xbox_config_desc,
     };
 
     uint8_t mac[6];
