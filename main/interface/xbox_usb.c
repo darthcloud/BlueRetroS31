@@ -10,6 +10,7 @@
 #include "esp_timer.h"
 #include "tinyusb_default_config.h"
 #include "device/usbd_pvt.h"
+#include "driver/gpio.h"
 #include "adapter/adapter.h"
 #include "adapter/config.h"
 
@@ -255,8 +256,16 @@ bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_requ
 
 void xbox_init(void)
 {
+    gpio_config_t io_conf = {0};
+    io_conf.intr_type = GPIO_INTR_DISABLE;
+    io_conf.mode = GPIO_MODE_INPUT;
+    io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
+    io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
+    io_conf.pin_bit_mask = 1ULL << 7;
+    gpio_config(&io_conf);
+
     const tinyusb_config_t tusb_cfg = {
-        .port = 0,
+        .port = 1,
         .phy.skip_setup = false,
         .phy.self_powered = false,
         .phy.vbus_monitor_io = -1,
@@ -266,7 +275,7 @@ void xbox_init(void)
         .descriptor.string = hid_string_desc,
         .descriptor.string_count = sizeof(hid_string_desc) / sizeof(hid_string_desc[0]),
         .descriptor.full_speed_config = xbox_config_desc,
-        .descriptor.high_speed_config = NULL,
+        .descriptor.high_speed_config = xbox_config_desc,
     };
 
     uint8_t mac[6];
@@ -281,7 +290,8 @@ void xbox_send_report(void) {
     BR_IFACE_DBG_LOG("%s: tud_ready: %d edpt_busy: %d\n", __FUNCTION__, tud_ready(), usbd_edpt_busy(0, ep_in));
     if (tud_ready() && !usbd_edpt_busy(0, ep_in)) {
         /* Buttons */
-        ep_in_buf[2] = wired_adapter.data[0].output[2]
+        uint8_t test = gpio_get_level(7) ? 0x00 : 0x10;
+        ep_in_buf[2] = (wired_adapter.data[0].output[2] | test)
             & wired_adapter.data[0].output_mask[2];
         /* Pressures */
         *(uint32_t *)&ep_in_buf[4] = wired_adapter.data[0].output32[1]
