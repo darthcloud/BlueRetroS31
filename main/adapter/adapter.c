@@ -442,6 +442,7 @@ void adapter_bridge(struct bt_data *bt_data) {
         adapter_debug_wired_print(&ctrl_output[bt_data->base.pids->out_idx]);
 #endif
         ctrl_output[bt_data->base.pids->out_idx].index = bt_data->base.pids->out_idx;
+#if 0
         int32_t menu_ret = sys_macro_hdl(&ctrl_output[bt_data->base.pids->out_idx], &bt_data->base.flags[PAD]);
         if (menu_ret) {
             /* We are in the adapter menu, mute output to system */
@@ -450,6 +451,7 @@ void adapter_bridge(struct bt_data *bt_data) {
             }
             return;
         }
+#endif
         for (uint32_t i = 0; out_mask; i++, out_mask >>= 1) {
             if (out_mask & 0x1) {
                 ctrl_output[i].index = i;
