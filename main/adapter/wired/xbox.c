@@ -7,6 +7,7 @@
 #include "tools/util.h"
 #include "adapter/config.h"
 #include "adapter/wired/wired.h"
+#include "driver/gpio.h"
 #include "xbox.h"
 
 #define XBOX_JOYSTICK_AXES_CNT 4
@@ -160,6 +161,13 @@ static void xbox_ctrl_from_generic(struct wired_ctrl *ctrl_data, struct wired_da
             }
         }
         wired_data->cnt_mask[btn_id] = ctrl_data->axes[i].cnt_mask;
+    }
+
+    if (map->buttons & 0x10) {
+        gpio_set_level(7, 0);
+    }
+    else {
+        gpio_set_level(7, 1);
     }
 
 #ifdef CONFIG_BLUERETRO_RAW_OUTPUT
