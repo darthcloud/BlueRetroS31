@@ -1,11 +1,17 @@
-# Old ESP32 defaults
-# CONFIG_BTDM_CTRL_MODE_BTDM=y
-# CONFIG_BTDM_CTRL_BLE_MAX_CONN=7
-# CONFIG_BTDM_CTRL_BR_EDR_MAX_ACL_CONN=7
-# CONFIG_BTDM_CTRL_BR_EDR_SCO_DATA_PATH_HCI=y
-# CONFIG_BTDM_CTRL_AUTO_LATENCY=y
-# CONFIG_BTDM_CTRL_HLI=n
-# CONFIG_BTDM_CTRL_MODEM_SLEEP=n
-# CONFIG_ESP32_REV_MIN_1=y
-# Can't use SRAM1 for IRAM as it conflict with un-updatable bootloaders in the wild :@ .
-# CONFIG_ESP_SYSTEM_ESP32_SRAM1_REGION_AS_IRAM=y
+#
+# Component config
+#
+
+#
+# Bluetooth
+#
+CONFIG_BT_ENABLED=y
+CONFIG_BT_CONTROLLER_ONLY=y
+
+#
+# Controller Options
+#
+CONFIG_BTDM_CTRL_MODE_BTDM=y
+# end of Controller Options
+# end of Bluetooth
+# end of Component config
