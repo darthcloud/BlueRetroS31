@@ -14,16 +14,4 @@ CONFIG_BT_CONTROLLER_ONLY=y
 CONFIG_BTDM_CTRL_MODE_BTDM=y
 # end of Controller Options
 # end of Bluetooth
-
-#
-# Hardware Settings
-#
-
-#
-# Chip revision
-#
-CONFIG_ESP32P4_SELECTS_REV_LESS_V3=y
-CONFIG_ESP32P4_REV_MIN_100=y
-# end of Chip revision
-# end of Hardware Settings
 # end of Component config
