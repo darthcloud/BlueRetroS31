@@ -199,7 +199,7 @@ static void bt_tx_task(void *param) {
 #ifdef CONFIG_BLUERETRO_BT_EXTERNAL_H4
                     hci_uart_tx(packet, packet_len);
 #else
-                    atomic_clear_bit(&bt_flags, BT_CTRL_READY);
+                    //atomic_clear_bit(&bt_flags, BT_CTRL_READY);
                     esp_vhci_host_send_packet(packet, packet_len);
 #endif
                 }
