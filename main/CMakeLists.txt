@@ -101,8 +101,14 @@ set(components
     "esp_timer"
     "nvs_flash"
     "spiffs"
-    "esp_tinyusb"
 )
+
+if(CONFIG_BLUERETRO_SYSTEM_XBOX)
+    list(APPEND components
+        "esp_tinyusb"
+    )
+endif()
+
 
 idf_component_register(
     SRCS "${srcs}" "${cov_srcs}"
